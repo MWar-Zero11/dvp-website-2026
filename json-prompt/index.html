@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Prompt Builder — DVP Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #060d18;
+    --surface:     #0d1929;
+    --surface2:    #0a1520;
+    --border:      #1a2d47;
+    --border-hi:   #243d5e;
+    --text:        #dde8f8;
+    --muted:       #6e8aaa;
+    --muted2:      #4e6280;
+    --accent:      #ff7338;
+    --accent2:     #ff2d78;
+    --gold:        #ffca28;
+    --green:       #4ade80;
+    --blue:        #60a5fa;
+    --purple:      #c084fc;
+    --orange:      #fb923c;
+    --red:         #f87171;
+    --accent-lo:   rgba(255,115,56,0.08);
+    --accent-md:   rgba(255,115,56,0.15);
+  }
+
+  html { font-size: 15px; scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Ambient glow ── */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255,45,120,0.07) 0%, rgba(255,115,56,0.03) 50%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Nav ── */
+  nav {
+    background: rgba(6,13,24,0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(26,45,71,0.6);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-logo img {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    object-fit: cover;
+  }
+
+  .nav-brand {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--text);
+  }
+
+  .nav-brand span {
+    background: linear-gradient(135deg, #ff7338, #ff2d78);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-back {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-back:hover { color: var(--text); }
+
+  /* ── Page wrapper ── */
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  .page-title span {
+    background: linear-gradient(135deg, #ff7338, #ff2d78);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,202,40,0.1);
+    border: 1px solid rgba(255,202,40,0.3);
+    border-radius: 99px;
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .header-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse-gold 2s infinite;
+  }
+
+  @keyframes pulse-gold {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .page-subtitle {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Two-column layout ── */
+  .layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .col-left {
+    flex: 55;
+    min-width: 0;
+  }
+
+  .col-right {
+    flex: 45;
+    min-width: 0;
+    position: sticky;
+    top: 60px;
+  }
+
+  @media (max-width: 860px) {
+    .layout { flex-direction: column; }
+    .col-right { position: static; }
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  /* ── Textarea block ── */
+  .textarea-wrap {
+    padding: 1.25rem;
+  }
+
+  .textarea-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.55rem;
+  }
+
+  .input-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .subject-badge {
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--border-hi);
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+  }
+
+  .subject-badge.detected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-lo);
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    padding: 0.85rem 1rem;
+    resize: vertical;
+    min-height: 88px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+
+  textarea::placeholder { color: var(--muted2); }
+
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,115,56,0.1);
+  }
+
+  /* ── Collapsible sections ── */
+  .ctrl-section {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    background: var(--surface);
+    border-left: 3px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+
+  .section-header:hover {
+    background: rgba(255,115,56,0.05);
+    border-left-color: var(--accent);
+  }
+
+  .ctrl-section.open .section-header {
+    border-left-color: var(--accent);
+    background: rgba(255,115,56,0.04);
+  }
+
+  .section-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: rgba(255,115,56,0.12);
+    color: var(--accent);
+    font-size: 0.65rem;
+  }
+
+  .chevron {
+    color: var(--muted2);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .ctrl-section.open .chevron {
+    transform: rotate(180deg);
+  }
+
+  .section-body {
+    display: none;
+    padding: 1rem;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    gap: 0.65rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ctrl-section.open .section-body {
+    display: grid;
+  }
+
+  /* Single-col override for special sections */
+  .section-body.single-col {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Control group ── */
+  .ctrl-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ctrl-group label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Select ── */
+  select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    padding: 0.4rem 1.9rem 0.4rem 0.7rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e8aaa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+    width: 100%;
+  }
+
+  select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,115,56,0.1);
+  }
+
+  select:hover { border-color: var(--border-hi); }
+
+  /* ── Checkbox row ── */
+  .checkbox-row {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .checkbox-label-text {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    grid-column: 1/-1;
+    display: block;
+  }
+
+  .cb-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  .cb-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border-hi);
+    border-radius: 4px;
+    background: var(--bg);
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+
+  .cb-item input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: var(--accent);
+  }
+
+  .cb-item input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    width: 5px;
+    height: 8px;
+    border: 1.5px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+
+  /* ── Consistency ID field ── */
+  .consistency-field {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .consistency-field label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .consistency-field small {
+    font-size: 0.7rem;
+    color: var(--muted2);
+    margin-top: 2px;
+  }
+
+  input[type="text"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    padding: 0.4rem 0.7rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+
+  input[type="text"]::placeholder { color: var(--muted2); }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,115,56,0.1);
+  }
+
+  /* ── JSON output card ── */
+  .output-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Gradient top line */
+  .output-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff7338, #ff2d78);
+    z-index: 1;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .output-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .output-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border-hi);
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .live-dot.active {
+    background: var(--green);
+    box-shadow: 0 0 6px rgba(74,222,128,0.5);
+    animation: pulse-dot 2.5s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.6; }
+  }
+
+  .output-subject-badge {
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 5px;
+    background: rgba(255,115,56,0.12);
+    color: var(--accent);
+    display: none;
+  }
+
+  .output-subject-badge.visible { display: inline-block; }
+
+  .output-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .token-estimate {
+    font-size: 0.68rem;
+    color: var(--muted2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(26,45,71,0.6);
+    border: 1px solid var(--border-hi);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    outline: none;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover {
+    background: rgba(26,45,71,1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .copy-btn.copied {
+    background: rgba(74,222,128,0.1);
+    border-color: rgba(74,222,128,0.4);
+    color: var(--green);
+  }
+
+  /* ── JSON pre ── */
+  pre {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.775rem;
+    line-height: 1.75;
+    padding: 1.25rem;
+    overflow-x: auto;
+    max-height: 62vh;
+    overflow-y: auto;
+    color: var(--muted);
+  }
+
+  pre::-webkit-scrollbar { width: 5px; height: 5px; }
+  pre::-webkit-scrollbar-track { background: transparent; }
+  pre::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+  pre.has-content { color: var(--text); }
+
+  /* ── Empty state ── */
+  .empty-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 3.5rem 1.5rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .empty-icon {
+    font-size: 2.25rem;
+    opacity: 0.3;
+    line-height: 1;
+  }
+
+  .empty-hint {
+    font-size: 0.75rem;
+    color: var(--muted2);
+    max-width: 220px;
+  }
+
+  /* ── JSON syntax highlighting ── */
+  .j-key   { color: #60a5fa; }
+  .j-str   { color: #4ade80; }
+  .j-num   { color: #fb923c; }
+  .j-bool  { color: #c084fc; }
+  .j-null  { color: #f87171; }
+  .j-punct { color: #4e6280; }
+
+  /* ── Tags strip ── */
+  .tags-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border);
+    min-height: 42px;
+    align-items: center;
+  }
+
+  .tags-empty {
+    font-size: 0.72rem;
+    color: var(--muted2);
+    font-style: italic;
+  }
+
+  .tag {
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 5px;
+    letter-spacing: 0.03em;
+  }
+
+  .tag-subject  { background: rgba(96,165,250,0.12);  color: #93c5fd; }
+  .tag-style    { background: rgba(74,222,128,0.1);   color: #86efac; }
+  .tag-time     { background: rgba(255,202,40,0.1);   color: #fde68a; }
+  .tag-weather  { background: rgba(251,146,60,0.1);   color: #fdba74; }
+  .tag-camera   { background: rgba(192,132,252,0.1);  color: #d8b4fe; }
+  .tag-extra    { background: rgba(110,138,170,0.1);  color: #94a3b8; }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted2);
+    padding-bottom: 1rem;
+  }
+
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+  /* ── Mobile ── */
+  @media (max-width: 600px) {
+    .page { padding: 1.25rem 1rem 3rem; }
+    .page-title { font-size: 1.4rem; }
+    .section-body { grid-template-columns: 1fr; }
+    pre { max-height: 45vh; font-size: 0.72rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <a href="../index.html" class="nav-logo">
+    <img src="../images/DVP_LOGO UseMe.jpg" alt="DVP">
+    <span class="nav-brand">DynamicVibe <span>Productions</span></span>
+  </a>
+  <a href="../index.html" class="nav-back">← Back to main site</a>
+</nav>
+
+<!-- ── Page ── -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-top">
+      <h1 class="page-title"><span>JSON</span> Prompt Builder</h1>
+      <span class="header-badge">NB2 · Real-time · No API</span>
+    </div>
+    <p class="page-subtitle">NanoBanana 2 &middot; Gemini 3.1 Flash Image &middot; Structured JSON generation &middot; No API calls &middot; Runs in browser</p>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="layout">
+
+    <!-- ── LEFT COLUMN ── -->
+    <div class="col-left">
+
+      <!-- Textarea -->
+      <div class="card">
+        <div class="textarea-wrap">
+          <div class="textarea-header">
+            <span class="input-label">Image Description</span>
+            <span class="subject-badge" id="subject-badge">No subject detected</span>
+          </div>
+          <textarea
+            id="prompt-input"
+            placeholder="Describe your image in plain English... e.g. a rainy night street in Tokyo with neon reflections, shallow depth of field, shot on 35mm film"
+            rows="4"
+            autofocus
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Section 1: Scene & Style -->
+      <div class="ctrl-section open" id="scene-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">🎨</span>
+            Scene &amp; Style
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="ctrl-group">
+            <label for="task-select">Task</label>
+            <select id="task-select">
+              <option value="generate_image" selected>generate_image</option>
+              <option value="edit_image">edit_image</option>
+              <option value="blend_images">blend_images</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="style-select">Style Preset</label>
+            <select id="style-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="photorealistic">Photorealistic</option>
+              <option value="cinematic">Cinematic</option>
+              <option value="painterly">Painterly</option>
+              <option value="surreal">Surreal</option>
+              <option value="anime">Anime</option>
+              <option value="documentary">Documentary</option>
+              <option value="editorial">Editorial</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="subject-select">Subject Type</label>
+            <select id="subject-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="portrait">Portrait</option>
+              <option value="product">Product</option>
+              <option value="landscape">Landscape</option>
+              <option value="architecture">Architecture</option>
+              <option value="animal">Animal</option>
+              <option value="food">Food</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="ref-style-select">Reference Style</label>
+            <select id="ref-style-select">
+              <option value="" selected>None</option>
+              <option value="Apple product photography">Apple product photography</option>
+              <option value="Wes Anderson">Wes Anderson</option>
+              <option value="National Geographic">National Geographic</option>
+              <option value="Vogue editorial">Vogue editorial</option>
+              <option value="Kubrick symmetrical">Kubrick symmetrical</option>
+              <option value="Neon noir">Neon noir</option>
+              <option value="Studio Ghibli">Studio Ghibli</option>
+              <option value="1970s film">1970s film</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="time-select">Time of Day</label>
+            <select id="time-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="dawn">Dawn</option>
+              <option value="morning">Morning</option>
+              <option value="noon">Noon</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="golden hour">Golden Hour</option>
+              <option value="sunset">Sunset</option>
+              <option value="blue hour">Blue Hour</option>
+              <option value="night">Night</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="season-select">Season</label>
+            <select id="season-select">
+              <option value="" selected>None</option>
+              <option value="spring">Spring</option>
+              <option value="summer">Summer</option>
+              <option value="autumn">Autumn</option>
+              <option value="winter">Winter</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="weather-select">Weather</label>
+            <select id="weather-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="clear">Clear</option>
+              <option value="cloudy">Cloudy</option>
+              <option value="rainy">Rainy</option>
+              <option value="foggy">Foggy</option>
+              <option value="stormy">Stormy</option>
+              <option value="snowy">Snowy</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="palette-select">Color Palette</label>
+            <select id="palette-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="warm">Warm</option>
+              <option value="cool">Cool</option>
+              <option value="monochromatic">Monochromatic</option>
+              <option value="vivid">Vivid</option>
+              <option value="muted">Muted</option>
+              <option value="complementary">Complementary</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Camera & Optics -->
+      <div class="ctrl-section" id="camera-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">📷</span>
+            Camera &amp; Optics
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="ctrl-group">
+            <label for="cam-type-select">Camera Type</label>
+            <select id="cam-type-select">
+              <option value="auto" selected>Auto</option>
+              <option value="DSLR">DSLR</option>
+              <option value="mirrorless">Mirrorless</option>
+              <option value="film">Film camera</option>
+              <option value="phone">Smartphone</option>
+              <option value="drone">Drone</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="lens-select">Lens</label>
+            <select id="lens-select">
+              <option value="auto" selected>Auto</option>
+              <option value="14mm ultra-wide">14mm ultra-wide</option>
+              <option value="24mm wide">24mm wide</option>
+              <option value="35mm">35mm</option>
+              <option value="50mm">50mm</option>
+              <option value="85mm portrait">85mm portrait</option>
+              <option value="100mm macro">100mm macro</option>
+              <option value="135mm telephoto">135mm telephoto</option>
+              <option value="200mm telephoto">200mm telephoto</option>
+              <option value="24-70mm zoom">24-70mm zoom</option>
+              <option value="anamorphic">Anamorphic</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="aperture-select">Aperture</label>
+            <select id="aperture-select">
+              <option value="auto" selected>Auto</option>
+              <option value="f/1.4">f/1.4</option>
+              <option value="f/2.0">f/2.0</option>
+              <option value="f/2.8">f/2.8</option>
+              <option value="f/4.0">f/4.0</option>
+              <option value="f/5.6">f/5.6</option>
+              <option value="f/8.0">f/8.0</option>
+              <option value="f/11">f/11</option>
+              <option value="f/16">f/16</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="dof-select">Depth of Field</label>
+            <select id="dof-select">
+              <option value="auto" selected>Auto</option>
+              <option value="shallow">Shallow</option>
+              <option value="medium">Medium</option>
+              <option value="deep">Deep</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="exposure-select">Exposure</label>
+            <select id="exposure-select">
+              <option value="balanced" selected>Balanced</option>
+              <option value="bright">Bright</option>
+              <option value="low-light">Low-light</option>
+              <option value="HDR">HDR</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="shutter-select">Shutter Speed</label>
+            <select id="shutter-select">
+              <option value="" selected>None</option>
+              <option value="1/1000">1/1000s</option>
+              <option value="1/500">1/500s</option>
+              <option value="1/250">1/250s</option>
+              <option value="1/125">1/125s</option>
+              <option value="1/60">1/60s</option>
+              <option value="1/30">1/30s</option>
+              <option value="1/15">1/15s</option>
+              <option value="1/8">1/8s</option>
+              <option value="1/4">1/4s</option>
+              <option value="1s">1s</option>
+              <option value="2s">2s</option>
+              <option value="5s">5s</option>
+              <option value="30s (bulb)">30s (bulb)</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="iso-select">ISO</label>
+            <select id="iso-select">
+              <option value="auto" selected>Auto</option>
+              <option value="50">ISO 50</option>
+              <option value="100">ISO 100</option>
+              <option value="200">ISO 200</option>
+              <option value="400">ISO 400</option>
+              <option value="800">ISO 800</option>
+              <option value="1600">ISO 1600</option>
+              <option value="3200">ISO 3200</option>
+              <option value="6400">ISO 6400</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="focal-feel-select">Focal Length Feel</label>
+            <select id="focal-feel-select">
+              <option value="auto" selected>Auto</option>
+              <option value="natural perspective">Natural perspective</option>
+              <option value="slight barrel distortion">Slight barrel distortion</option>
+              <option value="heavy perspective distortion">Heavy perspective distortion</option>
+              <option value="telephoto compression">Telephoto compression</option>
+              <option value="anamorphic oval bokeh">Anamorphic oval bokeh</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Lighting -->
+      <div class="ctrl-section" id="lighting-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">💡</span>
+            Lighting
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="ctrl-group">
+            <label for="light-type-select">Lighting Type</label>
+            <select id="light-type-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="natural">Natural</option>
+              <option value="studio">Studio</option>
+              <option value="dramatic">Dramatic</option>
+              <option value="soft">Soft</option>
+              <option value="rim">Rim</option>
+              <option value="backlit">Backlit</option>
+              <option value="ambient">Ambient</option>
+              <option value="neon">Neon</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="light-dir-select">Lighting Direction</label>
+            <select id="light-dir-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="front">Front</option>
+              <option value="side">Side</option>
+              <option value="back">Back</option>
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+              <option value="three-quarter">Three-quarter</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="color-temp-select">Color Temperature</label>
+            <select id="color-temp-select">
+              <option value="auto" selected>Auto-detect</option>
+              <option value="warm">Warm</option>
+              <option value="neutral">Neutral</option>
+              <option value="cool">Cool</option>
+              <option value="daylight">Daylight</option>
+              <option value="tungsten">Tungsten</option>
+              <option value="fluorescent">Fluorescent</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="light-mood-select">Mood</label>
+            <select id="light-mood-select">
+              <option value="auto" selected>Auto</option>
+              <option value="golden hour">Golden hour</option>
+              <option value="blue hour">Blue hour</option>
+              <option value="moonlit">Moonlit</option>
+              <option value="overcast">Overcast</option>
+              <option value="candlelight">Candlelight</option>
+              <option value="neon glow">Neon glow</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="light-intensity-select">Lighting Intensity</label>
+            <select id="light-intensity-select">
+              <option value="auto" selected>Auto</option>
+              <option value="0.3">0.3 (dim)</option>
+              <option value="0.5">0.5 (soft)</option>
+              <option value="0.7">0.7 (moderate)</option>
+              <option value="0.85">0.85 (bright)</option>
+              <option value="1.0">1.0 (harsh)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Composition -->
+      <div class="ctrl-section" id="composition-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">⊞</span>
+            Composition
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="ctrl-group">
+            <label for="framing-select">Framing</label>
+            <select id="framing-select">
+              <option value="auto" selected>Auto</option>
+              <option value="close_up">Close-up</option>
+              <option value="medium_shot">Medium shot</option>
+              <option value="full_shot">Full shot</option>
+              <option value="long_shot">Long shot</option>
+              <option value="extreme_long_shot">Extreme long shot</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="perspective-select">Perspective</label>
+            <select id="perspective-select">
+              <option value="auto" selected>Auto</option>
+              <option value="eye_level">Eye level</option>
+              <option value="high_angle">High angle</option>
+              <option value="low_angle">Low angle</option>
+              <option value="dutch_angle">Dutch angle</option>
+              <option value="bird_eye">Bird's eye</option>
+              <option value="worm_eye">Worm's eye</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="layout-select">Layout Rule</label>
+            <select id="layout-select">
+              <option value="auto" selected>Auto</option>
+              <option value="rule of thirds">Rule of thirds</option>
+              <option value="centered">Centered</option>
+              <option value="golden ratio">Golden ratio</option>
+              <option value="dynamic diagonal">Dynamic diagonal</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="placement-select">Subject Depth</label>
+            <select id="placement-select">
+              <option value="auto" selected>Auto</option>
+              <option value="foreground">Foreground</option>
+              <option value="midground">Midground</option>
+              <option value="background">Background</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="balance-select">Balance</label>
+            <select id="balance-select">
+              <option value="auto" selected>Auto</option>
+              <option value="symmetrical">Symmetrical</option>
+              <option value="asymmetrical">Asymmetrical</option>
+              <option value="weighted left">Weighted left</option>
+              <option value="weighted right">Weighted right</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Materials & Surface -->
+      <div class="ctrl-section" id="materials-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">◈</span>
+            Materials &amp; Surface
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="ctrl-group">
+            <label for="mat-primary-select">Primary Material</label>
+            <select id="mat-primary-select">
+              <option value="" selected>None</option>
+              <option value="oak wood">Oak wood</option>
+              <option value="stainless steel">Stainless steel</option>
+              <option value="cotton">Cotton</option>
+              <option value="glass">Glass</option>
+              <option value="leather">Leather</option>
+              <option value="marble">Marble</option>
+              <option value="concrete">Concrete</option>
+              <option value="plastic">Plastic</option>
+              <option value="fabric">Fabric</option>
+              <option value="metal">Metal</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="surface-texture-select">Surface Texture</label>
+            <select id="surface-texture-select">
+              <option value="" selected>None</option>
+              <option value="smooth">Smooth</option>
+              <option value="polished">Polished</option>
+              <option value="rough">Rough</option>
+              <option value="matte">Matte</option>
+              <option value="glossy">Glossy</option>
+              <option value="brushed">Brushed</option>
+              <option value="worn">Worn</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="surface-finish-select">Surface Finish</label>
+            <select id="surface-finish-select">
+              <option value="" selected>None</option>
+              <option value="matte">Matte</option>
+              <option value="satin">Satin</option>
+              <option value="gloss">Gloss</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="reflectivity-select">Reflectivity</label>
+            <select id="reflectivity-select">
+              <option value="" selected>None</option>
+              <option value="0.0">0.0 (none)</option>
+              <option value="0.2">0.2 (low)</option>
+              <option value="0.4">0.4 (medium)</option>
+              <option value="0.6">0.6 (high)</option>
+              <option value="0.9">0.9 (mirror)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6: Quality & Rendering -->
+      <div class="ctrl-section open" id="quality-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">✦</span>
+            Quality &amp; Rendering
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body">
+          <div class="ctrl-group">
+            <label for="aspect-select">Aspect Ratio</label>
+            <select id="aspect-select">
+              <option value="3:2" selected>3:2 — Standard DSLR</option>
+              <option value="1:1">1:1 — Square</option>
+              <option value="16:9">16:9 — Widescreen</option>
+              <option value="9:16">9:16 — Portrait / Reels</option>
+              <option value="4:5">4:5 — Instagram Portrait</option>
+              <option value="5:4">5:4 — Instagram Landscape</option>
+              <option value="4:3">4:3 — Classic Photo</option>
+              <option value="3:4">3:4 — Portrait</option>
+              <option value="2:3">2:3 — Tall Portrait</option>
+              <option value="21:9">21:9 — Cinematic</option>
+              <option value="4:1">4:1 — Panoramic Banner</option>
+              <option value="1:4">1:4 — Mobile Hero</option>
+              <option value="8:1">8:1 — Ultra-wide Strip</option>
+              <option value="1:8">1:8 — Ultra-tall Strip</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="res-select">Resolution</label>
+            <select id="res-select">
+              <option value="1K">1K</option>
+              <option value="2K">2K</option>
+              <option value="4K" selected>4K</option>
+              <option value="8K">8K</option>
+              <option value="8K HDR">8K HDR</option>
+              <option value="8K ultra-HD">8K ultra-HD</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="sharpness-select">Sharpness</label>
+            <select id="sharpness-select">
+              <option value="crisp" selected>Crisp</option>
+              <option value="ultra-sharp">Ultra-sharp</option>
+              <option value="soft">Soft</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="post-select">Post-processing</label>
+            <select id="post-select">
+              <option value="subtle" selected>Subtle</option>
+              <option value="none">None</option>
+              <option value="cinematic grading">Cinematic grading</option>
+              <option value="vintage">Vintage</option>
+              <option value="black and white">Black and white</option>
+              <option value="cross-process">Cross-process</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <label for="standards-select">Standards</label>
+            <select id="standards-select">
+              <option value="professional photography" selected>Professional photography</option>
+              <option value="editorial quality">Editorial quality</option>
+              <option value="commercial advertising">Commercial advertising</option>
+              <option value="social media">Social media</option>
+              <option value="print">Print</option>
+            </select>
+          </div>
+          <!-- Rendering checkboxes -->
+          <div class="checkbox-row">
+            <span class="checkbox-label-text">Rendering Options</span>
+            <label class="cb-item">
+              <input type="checkbox" id="cb-antialias" checked>
+              Anti-aliasing
+            </label>
+            <label class="cb-item">
+              <input type="checkbox" id="cb-noise" checked>
+              Noise reduction
+            </label>
+            <label class="cb-item">
+              <input type="checkbox" id="cb-raytrace">
+              Ray tracing
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 7: Character Consistency -->
+      <div class="ctrl-section" id="character-section">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="section-icon">◎</span>
+            Character Consistency
+          </span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-body single-col">
+          <div class="consistency-field">
+            <label for="consistency-id">Consistency ID</label>
+            <input
+              type="text"
+              id="consistency-id"
+              placeholder="e.g. alex-character-v1"
+            >
+            <small>Keeps a character identical across multiple generations. Leave blank to omit from JSON.</small>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col-left -->
+
+    <!-- ── RIGHT COLUMN ── -->
+    <div class="col-right">
+      <div class="output-card">
+
+        <!-- Output header -->
+        <div class="output-header">
+          <div class="output-title-row">
+            <span class="live-dot" id="live-dot"></span>
+            <span class="output-label">JSON Output</span>
+            <span class="output-subject-badge" id="output-subject-badge"></span>
+          </div>
+          <div class="output-actions">
+            <span class="token-estimate" id="token-estimate"></span>
+            <button class="copy-btn" id="copy-btn" onclick="copyJSON()">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.25"/>
+                <path d="M3 8H2a1 1 0 01-1-1V2a1 1 0 011-1h5a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Output body -->
+        <div id="output-body">
+          <div class="empty-msg" id="empty-msg">
+            <span class="empty-icon">{ }</span>
+            <span>Start typing above to generate your JSON prompt</span>
+            <span class="empty-hint">Auto-detects subject, style, lighting, weather, and more from your description.</span>
+          </div>
+          <pre id="json-output" style="display:none"></pre>
+        </div>
+
+        <!-- Tags strip -->
+        <div class="tags-strip" id="tags-strip">
+          <span class="tags-empty">Tags will appear here once a prompt is detected.</span>
+        </div>
+
+      </div>
+    </div><!-- /col-right -->
+
+  </div><!-- /layout -->
+
+  <footer>
+    Built by <a href="../index.html">DynamicVibe Productions</a> &middot; NanoBanana 2 JSON Builder 2026 &middot; Runs entirely in your browser &middot; No API calls
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  NanoBanana 2 JSON Prompt Builder — JavaScript
+// ═══════════════════════════════════════════════════════════════
+
+// ── Collapsible sections ─────────────────────────────────────
+document.querySelectorAll('.section-header').forEach(h => {
+  h.addEventListener('click', () => {
+    h.closest('.ctrl-section').classList.toggle('open');
+  });
+});
+
+// ── Keyword Detection Maps ────────────────────────────────────
+
+const STYLE_MAP = {
+  photorealistic: ["photorealistic","realistic","hyperrealistic","lifelike","real","photograph","photo","shot on"],
+  cinematic:      ["cinematic","film","movie","filmic","motion picture"],
+  painterly:      ["painterly","painting","oil painting","watercolor","impressionist","brushstroke","acrylic"],
+  surreal:        ["surreal","dreamlike","fantasy","magical","otherworldly","ethereal","abstract"],
+  anime:          ["anime","manga","cartoon","illustrated","2d","cel shaded"],
+  documentary:    ["documentary","journalistic","street photography","candid","reportage"],
+  editorial:      ["editorial","fashion","magazine","luxury","commercial","advertisement","advertise","brand"],
+};
+
+const LIGHTING_TYPE_MAP = {
+  natural:   ["natural light","sunlight","daylight","outdoors","outdoor"],
+  studio:    ["studio light","softbox","studio"],
+  dramatic:  ["dramatic","harsh light","high contrast","spotlight","chiaroscuro"],
+  soft:      ["soft light","diffused","gentle light","hazy light"],
+  backlit:   ["backlit","silhouette","contre-jour","back light"],
+  rim:       ["rim light","edge light","rim lighting"],
+  ambient:   ["ambient","ambient light"],
+  neon:      ["neon","neon lights","neon sign","neon glow"],
+};
+
+const LIGHTING_DIR_MAP = {
+  "front":         ["front lit","frontal light"],
+  "side":          ["side lit","side light","sidelight"],
+  "back":          ["backlit","from behind","back lit"],
+  "three-quarter": ["three-quarter","three quarter","45 degree"],
+  "top":           ["top lit","overhead light","lit from above"],
+  "bottom":        ["bottom lit","underlit","from below"],
+};
+
+const COLOR_TEMP_MAP = {
+  warm:     ["warm light","orange light","amber light","golden light","candlelight","tungsten"],
+  cool:     ["cool light","blue light","cold light","moonlit"],
+  neutral:  ["neutral light","balanced light","white light"],
+  daylight: ["daylight","noon light"],
+};
+
+const COLOR_PALETTE_MAP = {
+  warm:          ["warm tones","warm colors","terracotta","earthy","amber","orange hue"],
+  cool:          ["cool tones","cool colors","teal","icy","arctic","cold palette"],
+  monochromatic: ["black and white","monochrome","greyscale","grayscale"," bw "],
+  vivid:         ["vivid","saturated","colorful","vibrant","bold colors"],
+  muted:         ["muted","desaturated","faded","washed out","pastel","pale"],
+};
+
+const TIME_MAP = {
+  "dawn":        ["dawn","sunrise","early morning"],
+  "morning":     ["morning"],
+  "noon":        ["noon","midday","midday sun"],
+  "afternoon":   ["afternoon"],
+  "golden hour": ["golden hour","magic hour"],
+  "sunset":      ["sunset"],
+  "blue hour":   ["blue hour","twilight"],
+  "night":       ["night","nighttime","midnight","after dark","evening"],
+};
+
+const WEATHER_MAP = {
+  clear:  ["clear sky","sunny","bright day","blue sky"],
+  cloudy: ["cloudy","overcast","grey sky","gray sky"],
+  rainy:  ["rain","rainy","raining","drizzle","wet streets","wet"],
+  foggy:  ["fog","foggy","mist","misty","haze","hazy"],
+  stormy: ["storm","stormy","thunder","lightning"],
+  snowy:  ["snow","snowy","snowing","blizzard"],
+};
+
+const SEASON_MAP = {
+  spring: ["spring","springtime","cherry blossom","blooming"],
+  summer: ["summer","summertime","hot day","beach"],
+  autumn: ["autumn","fall","autumnal","fall leaves","foliage"],
+  winter: ["winter","wintertime","snow","frost","cold"],
+};
+
+const LOCATION_MAP = {
+  "urban cafe":    ["cafe","coffee shop","coffee house","bistro","coffeehouse"],
+  "urban street":  ["street","city street","downtown","alley","sidewalk","crosswalk"],
+  "modern office": ["office","workspace","desk","corporate"],
+  "beach":         ["beach","ocean","shoreline","coastal","waves"],
+  "forest":        ["forest","woods","trees","jungle","woodland"],
+  "studio":        ["studio","white background","plain background","seamless background"],
+  "rooftop":       ["rooftop","roof top","terrace","balcony"],
+  "mountain":      ["mountain","mountains","peak","summit","hills","highland"],
+  "desert":        ["desert","sand dunes","arid"],
+  "underwater":    ["underwater","ocean floor","submerged","beneath water"],
+  "space":         ["space","galaxy","cosmos","stars","nebula"],
+  "urban":         ["city","urban"],
+  "park":          ["park","garden","meadow","field","grass"],
+  "indoor":        ["indoor","inside","interior","room","living room","kitchen"],
+};
+
+const FRAMING_MAP = {
+  close_up:          ["close up","closeup","macro","extreme close","face shot","tight shot"],
+  medium_shot:       ["medium shot","half body","waist up","bust shot","mid shot"],
+  full_shot:         ["full body","full shot","head to toe","whole body"],
+  long_shot:         ["long shot","wide shot","establishing shot","far away","distant"],
+  extreme_long_shot: ["extreme wide","extreme long","panoramic","bird's eye view"],
+};
+
+const PERSPECTIVE_MAP = {
+  eye_level:  ["eye level","straight on","eye-level"],
+  high_angle: ["high angle","looking down","from above","overhead angle"],
+  low_angle:  ["low angle","looking up","from below"],
+  dutch_angle:["dutch angle","tilted","canted"],
+  bird_eye:   ["bird's eye","birds eye","top view","top-down","aerial view"],
+  worm_eye:   ["worm's eye","worms eye","extreme low angle"],
+};
+
+const LAYOUT_MAP = {
+  "rule of thirds":   ["rule of thirds","off-center","thirds"],
+  "centered":         ["centered","symmetrical","center frame","dead center"],
+  "golden ratio":     ["golden ratio","fibonacci"],
+  "dynamic diagonal": ["diagonal","dynamic composition"],
+};
+
+const DOF_MAP = {
+  shallow: ["shallow depth","bokeh","blurred background","soft background","out of focus background"],
+  deep:    ["deep depth","everything in focus","sharp throughout","front to back sharp"],
+};
+
+const SUBJECT_MAP = {
+  portrait:     ["portrait","person","man","woman","face","people","human","model","girl","boy","individual","character"],
+  product:      ["product","object","item","packaging","bottle","can","box","gadget","device"],
+  landscape:    ["landscape","scenery","skyline","horizon","panorama"],
+  architecture: ["building","architecture","structure","house","skyscraper","tower","bridge","facade"],
+  animal:       ["dog","cat","animal","bird","horse","lion","tiger","wildlife","creature"],
+  food:         ["food","meal","dish","beverage","cup of coffee","latte","espresso","burger","plate","cuisine","recipe","ingredients"],
+};
+
+// ── Subject defaults ──────────────────────────────────────────
+
+const CAM_DEFAULTS = {
+  portrait:     {lens:"85mm portrait",    aperture:"f/1.4", iso:200,  dof:"shallow", cam_type:"mirrorless"},
+  product:      {lens:"100mm macro",      aperture:"f/8.0", iso:100,  dof:"deep",    cam_type:"mirrorless"},
+  landscape:    {lens:"24-70mm zoom",     aperture:"f/8.0", iso:100,  dof:"deep",    cam_type:"DSLR"},
+  architecture: {lens:"24-70mm zoom",     aperture:"f/8.0", iso:100,  dof:"deep",    cam_type:"DSLR"},
+  animal:       {lens:"85mm portrait",    aperture:"f/2.8", iso:200,  dof:"shallow", cam_type:"DSLR"},
+  food:         {lens:"100mm macro",      aperture:"f/4.0", iso:100,  dof:"shallow", cam_type:"mirrorless"},
+  general:      {lens:"85mm portrait",    aperture:"f/2.8", iso:200,  dof:"medium",  cam_type:"DSLR"},
+};
+
+const CAM_ANGLE_DEFAULTS = {
+  portrait:"eye-level", product:"eye-level", landscape:"eye-level",
+  architecture:"low_angle", animal:"eye-level", food:"overhead", general:"eye-level",
+};
+
+const FRAMING_DEFAULTS = {
+  portrait:"medium_shot", product:"close_up", landscape:"long_shot",
+  architecture:"long_shot", animal:"medium_shot", food:"close_up", general:"medium_shot",
+};
+
+const LAYOUT_DEFAULTS = {
+  portrait:"rule of thirds", product:"centered", landscape:"rule of thirds",
+  architecture:"rule of thirds", animal:"rule of thirds", food:"centered", general:"rule of thirds",
+};
+
+const INCLUDE_MAP = {
+  portrait:     ["detailed skin texture","sharp focus on eyes","natural bokeh"],
+  product:      ["clean background","sharp product edges","accurate colors","no dust"],
+  landscape:    ["dramatic sky","sharp foreground","rich colors","depth"],
+  architecture: ["sharp edges","architectural detail","clean lines","geometry"],
+  animal:       ["fur detail","sharp eyes","natural pose"],
+  food:         ["appetizing colors","sharp food detail","texture"],
+  general:      ["sharp focus on subject","natural lighting","clean background"],
+};
+
+const AVOID_MAP = {
+  portrait:     ["artifacts","extra limbs","deformed hands","text","watermarks","blurry","noise","extra people"],
+  product:      ["artifacts","dust","unwanted reflections","text","watermarks","noise","shadows","extra objects"],
+  landscape:    ["artifacts","text","watermarks","noise","overexposed sky","washed out colors"],
+  architecture: ["artifacts","distortion","text","watermarks","people blocking facade","noise"],
+  animal:       ["artifacts","extra limbs","deformed paws","text","watermarks","blurry","noise"],
+  food:         ["artifacts","unnatural colors","text","watermarks","hair","noise"],
+  general:      ["artifacts","extra limbs","deformed hands","text","watermarks","blurry","noise"],
+};
+
+// ── Helpers ───────────────────────────────────────────────────
+
+function norm(text) { return " " + text.toLowerCase().trim() + " "; }
+
+function matchFirst(text, map) {
+  const t = norm(text);
+  for (const [key, kws] of Object.entries(map)) {
+    for (const kw of kws) { if (t.includes(kw)) return key; }
+  }
+  return null;
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function isAuto(v) { return !v || v === "auto"; }
+
+// ── Builder ───────────────────────────────────────────────────
+
+function buildPrompt(userInput, opts) {
+  const {
+    taskType, stylePreset, subjectOverride, referenceStyle,
+    timeOfDay, season, weather, colorPalette,
+    camType, lens, aperture, dof, exposure, shutterSpeed, iso, focalFeel,
+    lightType, lightDir, colorTemp, lightMood, lightIntensity,
+    framing, perspective, layout, placement, balance,
+    materialPrimary, surfaceTexture, surfaceFinish, reflectivity,
+    aspectRatio, resolution, sharpness, postProcessing, standards,
+    antiAliasing, noiseReduction, rayTracing, consistencyId
+  } = opts;
+
+  // ── Subject detection ──
+  const subject = (!isAuto(subjectOverride) ? subjectOverride : null)
+    || matchFirst(userInput, SUBJECT_MAP) || "general";
+  const cam = CAM_DEFAULTS[subject];
+
+  // ── Style ──
+  const styleDefault = {product:"editorial",landscape:"cinematic",architecture:"editorial",food:"editorial"}[subject] || "photorealistic";
+  const stylePrimary = (!isAuto(stylePreset) ? stylePreset : null)
+    || matchFirst(userInput, STYLE_MAP) || styleDefault;
+
+  // ── Time ──
+  const timeVal = (!isAuto(timeOfDay) ? timeOfDay : null)
+    || matchFirst(userInput, TIME_MAP) || "afternoon";
+
+  // ── Weather ──
+  const weatherVal = (!isAuto(weather) ? weather : null)
+    || matchFirst(userInput, WEATHER_MAP) || "clear";
+
+  // ── Season ──
+  const seasonVal = season || matchFirst(userInput, SEASON_MAP) || null;
+
+  // ── Lighting ──
+  const lightTypeVal = (!isAuto(lightType) ? lightType : null)
+    || matchFirst(userInput, LIGHTING_TYPE_MAP)
+    || (subject === "product" ? "studio" : weatherVal === "snowy" ? "soft" : "natural");
+
+  const lightDirVal = (!isAuto(lightDir) ? lightDir : null)
+    || matchFirst(userInput, LIGHTING_DIR_MAP) || "three-quarter";
+
+  const timeColorTemp = {
+    dawn:"warm", morning:"warm", "golden hour":"warm", sunset:"warm",
+    noon:"daylight", afternoon:"daylight", "blue hour":"cool", night:"cool"
+  };
+  const colorTempVal = (!isAuto(colorTemp) ? colorTemp : null)
+    || matchFirst(userInput, COLOR_TEMP_MAP) || timeColorTemp[timeVal] || "neutral";
+
+  const timeMood = {
+    dawn:"golden hour", morning:"golden hour", "golden hour":"golden hour",
+    sunset:"golden hour", "blue hour":"blue hour", night:"moonlit"
+  };
+  const lightMoodVal = (!isAuto(lightMood) ? lightMood : null)
+    || timeMood[timeVal] || "overcast";
+
+  const lightIntensityVal = (!isAuto(lightIntensity) ? lightIntensity : null);
+
+  // ── Color palette ──
+  const colorPaletteDefault = {warm:"warm",cool:"cool",daylight:"vivid"}[colorTempVal] || "warm";
+  const colorPaletteVal = (!isAuto(colorPalette) ? colorPalette : null)
+    || matchFirst(userInput, COLOR_PALETTE_MAP) || colorPaletteDefault;
+
+  // ── Camera ──
+  const camTypeVal = (!isAuto(camType) ? camType : null) || cam.cam_type;
+  const lensVal    = (!isAuto(lens)    ? lens    : null) || cam.lens;
+  const isoVal     = (!isAuto(iso)     ? parseInt(iso) : null) || cam.iso;
+
+  // DOF + aperture
+  const dofDetected = matchFirst(userInput, DOF_MAP);
+  const dofVal = (!isAuto(dof) ? dof : null) || dofDetected || cam.dof;
+
+  let apertureVal = (!isAuto(aperture) ? aperture : null) || cam.aperture;
+  if (isAuto(aperture)) {
+    if (dofVal === "shallow" && !["product","landscape","architecture"].includes(subject)) apertureVal = "f/1.4";
+    else if (dofVal === "deep") apertureVal = "f/8.0";
+  }
+
+  const camAngle = CAM_ANGLE_DEFAULTS[subject];
+
+  // ── Location ──
+  const location = matchFirst(userInput, LOCATION_MAP) || "outdoor location";
+
+  // ── Atmosphere ──
+  const atmMap = {
+    foggy: ["fog","mist"],
+    rainy: ["rain","wet reflections"],
+    snowy: ["falling snow"],
+    stormy: ["dark clouds","dramatic atmosphere"]
+  };
+  const atmConds = atmMap[weatherVal] || [];
+
+  // ── Composition ──
+  const framingVal    = (!isAuto(framing)     ? framing     : null) || matchFirst(userInput, FRAMING_MAP)     || FRAMING_DEFAULTS[subject];
+  const perspectiveVal= (!isAuto(perspective) ? perspective : null) || matchFirst(userInput, PERSPECTIVE_MAP) || (subject === "food" ? "bird_eye" : "eye_level");
+  const layoutVal     = (!isAuto(layout)      ? layout      : null) || matchFirst(userInput, LAYOUT_MAP)      || LAYOUT_DEFAULTS[subject];
+  const placementVal  = (!isAuto(placement)   ? placement   : null) || null;
+  const balanceVal    = (!isAuto(balance)      ? balance      : null) || null;
+
+  // ── Quality lists ──
+  const include = [...INCLUDE_MAP[subject]];
+  let   avoid   = [...AVOID_MAP[subject]];
+  if (["foggy","rainy","stormy"].includes(weatherVal)) avoid.push("overexposed");
+  if (stylePrimary === "photorealistic") avoid.push("painterly artifacts");
+  if (stylePrimary === "anime") {
+    avoid = avoid.filter(a => !["extra limbs","deformed hands"].includes(a));
+    avoid.push("3d render","photorealistic artifacts");
+  }
+
+  const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+
+  // ── Assemble JSON ──
+  const prompt = {
+    task: taskType || "generate_image",
+    aspect_ratio: aspectRatio,
+    ...(consistencyId ? { consistency_id: consistencyId } : {}),
+    metadata: {
+      prompt_version: "2.0",
+      model: "NanoBanana-2",
+      source_prompt: userInput,
+      timestamp: now,
+    },
+    style: {
+      primary: stylePrimary,
+      rendering_quality: stylePrimary === "photorealistic"
+        ? `hyperrealistic ${resolution}` : resolution,
+      ...(referenceStyle ? { reference_style: referenceStyle } : {}),
+      lighting: {
+        type: lightTypeVal,
+        direction: lightDirVal,
+        color_temperature: colorTempVal,
+        mood: lightMoodVal,
+        ...(lightIntensityVal ? { intensity: parseFloat(lightIntensityVal) } : {}),
+      },
+      color_palette: colorPaletteVal,
+    },
+    technical: {
+      camera: {
+        type: camTypeVal,
+        lens: lensVal,
+        aperture: apertureVal,
+        iso: isoVal,
+        angle: camAngle,
+        exposure: exposure || "balanced",
+        ...(shutterSpeed ? { shutter_speed: shutterSpeed } : {}),
+        ...(focalFeel && !isAuto(focalFeel) ? { focal_length_feel: focalFeel } : {}),
+      },
+      depth_of_field: dofVal,
+      resolution,
+      sharpness: sharpness || "crisp",
+      post_processing: postProcessing || "subtle",
+      rendering: {
+        anti_aliasing: antiAliasing,
+        noise_reduction: noiseReduction,
+        ray_tracing: rayTracing,
+      },
+      standards: standards || "professional photography",
+    },
+    environment: {
+      location,
+      time_of_day: timeVal,
+      weather: weatherVal,
+      ...(seasonVal ? { temporal: { season: seasonVal } } : {}),
+      ...(atmConds.length ? { atmosphere: { conditions: atmConds } } : {}),
+    },
+    composition: {
+      framing: framingVal,
+      perspective: perspectiveVal,
+      layout_rule: layoutVal,
+      ...(placementVal ? { subject_depth: placementVal } : {}),
+      ...(balanceVal ? { balance: balanceVal } : {}),
+    },
+    ...(materialPrimary ? {
+      materials: {
+        primary: materialPrimary,
+        ...(surfaceTexture ? { texture: surfaceTexture } : {}),
+        ...(surfaceFinish  ? { finish: surfaceFinish   } : {}),
+        ...(reflectivity   ? { reflectivity: parseFloat(reflectivity) } : {}),
+      }
+    } : {}),
+    quality: {
+      include,
+      avoid,
+    },
+  };
+
+  return { prompt, subject, stylePrimary, timeVal, weatherVal, seasonVal, location };
+}
+
+// ── Syntax highlighter ────────────────────────────────────────
+
+function highlightJSON(json) {
+  return json
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/("(?:[^"\\]|\\.)*")(\s*:)/g, '<span class="j-key">$1</span><span class="j-punct">$2</span>')
+    .replace(/:\s*("(?:[^"\\]|\\.)*")/g, (m, s) => ': <span class="j-str">' + s + '</span>')
+    .replace(/:\s*(\d+\.?\d*)/g,         (m, n) => ': <span class="j-num">' + n + '</span>')
+    .replace(/:\s*(true|false)/g,         (m, b) => ': <span class="j-bool">' + b + '</span>')
+    .replace(/:\s*(null)/g,               (m, n) => ': <span class="j-null">' + n + '</span>')
+    .replace(/([{}\[\],])/g,              (m, p) => '<span class="j-punct">' + p + '</span>');
+}
+
+// ── Tags ─────────────────────────────────────────────────────
+
+function buildTags(subject, stylePrimary, timeVal, weatherVal, seasonVal, location) {
+  const tags = [
+    { label: subject,       cls: "tag-subject" },
+    { label: stylePrimary,  cls: "tag-style"   },
+    { label: timeVal,       cls: "tag-time"    },
+    { label: weatherVal,    cls: "tag-weather" },
+  ];
+  if (seasonVal) tags.push({ label: seasonVal, cls: "tag-extra" });
+  if (location && location !== "outdoor location") tags.push({ label: location, cls: "tag-camera" });
+  return tags.map(t => `<span class="tag ${t.cls}">${t.label}</span>`).join("");
+}
+
+// ── Render ────────────────────────────────────────────────────
+
+let debounceTimer;
+let lastJSON = "";
+
+function render() {
+  const input = document.getElementById("prompt-input").value.trim();
+
+  const pre     = document.getElementById("json-output");
+  const emptyEl = document.getElementById("empty-msg");
+  const dotEl   = document.getElementById("live-dot");
+  const badgeEl = document.getElementById("subject-badge");
+  const outBadge= document.getElementById("output-subject-badge");
+  const tagsEl  = document.getElementById("tags-strip");
+  const tokenEl = document.getElementById("token-estimate");
+
+  if (!input) {
+    pre.style.display = "none";
+    emptyEl.style.display = "flex";
+    dotEl.classList.remove("active");
+    badgeEl.textContent = "No subject detected";
+    badgeEl.classList.remove("detected");
+    outBadge.classList.remove("visible");
+    outBadge.textContent = "";
+    tagsEl.innerHTML = '<span class="tags-empty">Tags will appear here once a prompt is detected.</span>';
+    tokenEl.textContent = "";
+    lastJSON = "";
+    return;
+  }
+
+  // Collect opts from all controls
+  const opts = {
+    taskType:       getVal("task-select"),
+    stylePreset:    getVal("style-select"),
+    subjectOverride:getVal("subject-select"),
+    referenceStyle: getVal("ref-style-select"),
+    timeOfDay:      getVal("time-select"),
+    season:         getVal("season-select"),
+    weather:        getVal("weather-select"),
+    colorPalette:   getVal("palette-select"),
+    camType:        getVal("cam-type-select"),
+    lens:           getVal("lens-select"),
+    aperture:       getVal("aperture-select"),
+    dof:            getVal("dof-select"),
+    exposure:       getVal("exposure-select"),
+    shutterSpeed:   getVal("shutter-select"),
+    iso:            getVal("iso-select"),
+    focalFeel:      getVal("focal-feel-select"),
+    lightType:      getVal("light-type-select"),
+    lightDir:       getVal("light-dir-select"),
+    colorTemp:      getVal("color-temp-select"),
+    lightMood:      getVal("light-mood-select"),
+    lightIntensity: getVal("light-intensity-select"),
+    framing:        getVal("framing-select"),
+    perspective:    getVal("perspective-select"),
+    layout:         getVal("layout-select"),
+    placement:      getVal("placement-select"),
+    balance:        getVal("balance-select"),
+    materialPrimary:getVal("mat-primary-select"),
+    surfaceTexture: getVal("surface-texture-select"),
+    surfaceFinish:  getVal("surface-finish-select"),
+    reflectivity:   getVal("reflectivity-select"),
+    aspectRatio:    getVal("aspect-select"),
+    resolution:     getVal("res-select"),
+    sharpness:      getVal("sharpness-select"),
+    postProcessing: getVal("post-select"),
+    standards:      getVal("standards-select"),
+    antiAliasing:   document.getElementById("cb-antialias").checked,
+    noiseReduction: document.getElementById("cb-noise").checked,
+    rayTracing:     document.getElementById("cb-raytrace").checked,
+    consistencyId:  document.getElementById("consistency-id").value.trim(),
+  };
+
+  const { prompt, subject, stylePrimary, timeVal, weatherVal, seasonVal, location }
+    = buildPrompt(input, opts);
+
+  const jsonStr = JSON.stringify(prompt, null, 2);
+  lastJSON = jsonStr;
+
+  pre.innerHTML = highlightJSON(jsonStr);
+  pre.className = "has-content";
+  pre.style.display = "block";
+  emptyEl.style.display = "none";
+  dotEl.classList.add("active");
+
+  const label = subject.charAt(0).toUpperCase() + subject.slice(1);
+  badgeEl.textContent = label + " detected";
+  badgeEl.classList.add("detected");
+  outBadge.textContent = label;
+  outBadge.classList.add("visible");
+
+  const tokenEst = Math.ceil(jsonStr.length / 4);
+  tokenEl.textContent = "~" + tokenEst + " tokens";
+
+  tagsEl.innerHTML = buildTags(subject, stylePrimary, timeVal, weatherVal, seasonVal, location);
+}
+
+function onInput() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(render, 120);
+}
+
+function copyJSON() {
+  if (!lastJSON) return;
+  navigator.clipboard.writeText(lastJSON).then(() => {
+    const btn = document.getElementById("copy-btn");
+    btn.classList.add("copied");
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+      <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+        <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.25"/>
+        <path d="M3 8H2a1 1 0 01-1-1V2a1 1 0 011-1h5a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+      </svg> Copy`;
+    }, 2000);
+  }).catch(() => {
+    // Fallback for non-https
+    const ta = document.createElement("textarea");
+    ta.value = lastJSON;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    const btn = document.getElementById("copy-btn");
+    btn.classList.add("copied");
+    btn.textContent = "✓ Copied!";
+    setTimeout(() => { btn.classList.remove("copied"); btn.textContent = "Copy"; }, 2000);
+  });
+}
+
+// ── Event listeners ───────────────────────────────────────────
+
+document.getElementById("prompt-input").addEventListener("input", onInput);
+document.getElementById("consistency-id").addEventListener("input", onInput);
+
+// All selects & checkboxes → immediate re-render
+document.querySelectorAll("select, input[type='checkbox']").forEach(el => {
+  el.addEventListener("change", render);
+});
+</script>
+</body>
+</html>

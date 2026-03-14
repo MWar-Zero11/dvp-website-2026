@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRT Maker — DVP Tools</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dvp-bg':     '#060d18',
+            'dvp-card':   '#0d1929',
+            'dvp-border': '#1a2d47',
+            'dvp-text':   '#dde8f8',
+            'dvp-muted':  '#6e8aaa',
+            'dvp-coral':  '#ff7338',
+            'dvp-pink':   '#ff2d78',
+            'dvp-teal':   '#38d9d9',
+            'dvp-blue':   '#5b8dee',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background:#060d18; color:#dde8f8; font-family:system-ui,-apple-system,sans-serif; }
+
+    .card-bg {
+      background: linear-gradient(135deg, #0d1929 0%, #0a1520 100%);
+      border: 1px solid #1a2d47;
+    }
+
+    .skill-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid #1a2d47;
+      color: #6e8aaa;
+      white-space: nowrap;
+    }
+
+    .teal-btn {
+      background: linear-gradient(135deg, rgba(56,217,217,.18), rgba(91,141,238,.12));
+      border: 1px solid rgba(56,217,217,.4);
+      color: #38d9d9;
+      transition: opacity .2s;
+    }
+    .teal-btn:hover { opacity: .8; }
+
+    .feature-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid #1a2d47;
+    }
+    .feature-row:last-child { border-bottom: none; }
+
+    .feature-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .platform-card {
+      background: #0d1929;
+      border: 1px solid #1a2d47;
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    /* Mock UI preview */
+    .mock-app {
+      background: #060d18;
+      border: 1px solid #1a2d47;
+      border-radius: 8px;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .mock-titlebar {
+      background: #0d1929;
+      border-bottom: 1px solid #1a2d47;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-title { font-size: 12px; color: #6e8aaa; margin-left: 4px; }
+    .mock-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .mock-dropzone {
+      border: 1px dashed #243d5e;
+      border-radius: 6px;
+      padding: 24px;
+      text-align: center;
+      color: #4e6280;
+      font-size: 12px;
+    }
+    .mock-btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .mock-pill {
+      padding: 4px 12px; border-radius: 4px; font-size: 11px;
+      border: 1px solid #1a2d47; color: #4e6280;
+    }
+    .mock-pill.active { border-color: #38d9d9; color: #38d9d9; background: rgba(56,217,217,.08); }
+    .mock-cta {
+      background: #ff7338; border-radius: 5px;
+      padding: 10px; text-align: center;
+      font-size: 12px; font-weight: 600; color: #fff;
+    }
+    .mock-file {
+      background: #0d1929; border: 1px solid #1a2d47;
+      border-radius: 5px; padding: 10px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .mock-file-name { font-size: 12px; color: #dde8f8; }
+    .mock-badge-done {
+      font-size: 10px; padding: 2px 8px; border-radius: 3px;
+      border: 1px solid #166534; color: #4ade80; background: rgba(74,222,128,.07);
+    }
+    .mock-badge-proc {
+      font-size: 10px; padding: 2px 8px; border-radius: 3px;
+      border: 1px solid #cc5a28; color: #ff7338; background: rgba(255,115,56,.08);
+    }
+    .mock-progress { height: 4px; background: #112235; border-radius: 2px; overflow: hidden; }
+    .mock-progress-fill { height: 100%; background: linear-gradient(to right, #cc5a28, #ff7338); border-radius: 2px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Nav -->
+  <nav style="border-bottom:1px solid #1a2d47; background:#060d18;" class="sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <a href="../index.html" class="flex items-center gap-2 text-sm" style="color:#6e8aaa; transition:color .2s;"
+        onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to DVP
+      </a>
+      <div class="flex items-center gap-2">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,rgba(56,217,217,.15),rgba(91,141,238,.1));border:1px solid rgba(56,217,217,.3);border-radius:7px;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M7 9h10M7 12h6M7 15h8"/>
+          </svg>
+        </div>
+        <span class="font-semibold text-sm" style="color:#dde8f8;">SRT Maker</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="relative py-20 px-6 overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse 60% 50% at 50% 0%, rgba(56,217,217,.06) 0%, rgba(91,141,238,.04) 40%, transparent 70%);"></div>
+    <div class="max-w-5xl mx-auto relative z-10 text-center">
+      <div class="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" style="background:rgba(56,217,217,.07);border:1px solid rgba(56,217,217,.2);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        </svg>
+        <span style="font-size:11px;font-weight:600;letter-spacing:.09em;color:#38d9d9;">DESKTOP APP · FREE</span>
+      </div>
+
+      <h1 class="text-5xl font-extrabold text-white mb-5" style="letter-spacing:-.02em;">
+        SRT <span style="color:#38d9d9;">Maker</span>
+      </h1>
+      <p class="text-lg max-w-xl mx-auto mb-10" style="color:#6e8aaa; line-height:1.75;">
+        Drop any video or audio file. Get a perfectly formatted <strong style="color:#a0b8d0;">.srt subtitle file</strong> in minutes —
+        powered by Whisper AI, running entirely on your machine. No cloud, no subscription.
+      </p>
+
+      <div class="flex items-center justify-center gap-4 flex-wrap">
+        <a href="#download" class="teal-btn px-7 py-3 rounded-xl font-semibold text-sm" style="display:inline-block;letter-spacing:.02em;">
+          Download Free →
+        </a>
+        <a href="#features" class="px-7 py-3 rounded-xl font-semibold text-sm" style="display:inline-block;letter-spacing:.02em;border:1px solid #1a2d47;color:#6e8aaa;transition:border-color .2s,color .2s;"
+          onmouseover="this.style.borderColor='#243d5e';this.style.color='#dde8f8'"
+          onmouseout="this.style.borderColor='#1a2d47';this.style.color='#6e8aaa'">
+          See Features
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- App preview mockup -->
+  <section class="px-6 pb-16">
+    <div class="max-w-2xl mx-auto">
+      <div class="mock-app" style="box-shadow:0 0 60px rgba(56,217,217,.06);">
+        <div class="mock-titlebar">
+          <div class="mock-dot" style="background:#ff5f57;"></div>
+          <div class="mock-dot" style="background:#febc2e;"></div>
+          <div class="mock-dot" style="background:#28c840;"></div>
+          <span class="mock-title">SRT Maker</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-dropzone">
+            <div style="font-size:22px;margin-bottom:8px;color:#243d5e;">↓</div>
+            Click to select files, or drop them here<br>
+            <span style="font-size:10px;color:#2e4560;margin-top:4px;display:block;">MP4 · MKV · MOV · MP3 · WAV · M4A · FLAC</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#4e6280;margin-bottom:6px;">Language</div>
+              <div class="mock-btn-group">
+                <div class="mock-pill active">Auto</div>
+                <div class="mock-pill">Italian</div>
+                <div class="mock-pill">German</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#4e6280;margin-bottom:6px;">Quality</div>
+              <div class="mock-btn-group">
+                <div class="mock-pill">Fast</div>
+                <div class="mock-pill">Balanced</div>
+                <div class="mock-pill active">Best</div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-cta">Generate SRT Files</div>
+          <div style="height:1px;background:#1a2d47;"></div>
+          <div class="mock-file">
+            <div>
+              <div class="mock-file-name">opera_recording_act1.mp4</div>
+              <div style="font-size:10px;color:#4e6280;margin-top:2px;">MP4 · 842.3 MB</div>
+            </div>
+            <span class="mock-badge-done">Done</span>
+          </div>
+          <div class="mock-file">
+            <div>
+              <div class="mock-file-name">rehearsal_march_14.mov</div>
+              <div style="font-size:10px;color:#4e6280;margin-top:2px;">MOV · 1.2 GB</div>
+            </div>
+            <span class="mock-badge-proc">Transcribing</span>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#4e6280;margin-bottom:6px;">
+              <span>Processing rehearsal_march_14.mov</span>
+              <span style="color:#ff7338;font-weight:600;">63%</span>
+            </div>
+            <div class="mock-progress"><div class="mock-progress-fill" style="width:63%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-16 px-6" style="border-top:1px solid #0f1e30;">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#38d9d9;" class="mb-3 block">Features</span>
+        <h2 class="text-3xl font-extrabold text-white" style="letter-spacing:-.01em;">Everything you need, nothing you don't</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Feature card: Offline -->
+        <div class="card-bg rounded-2xl p-6 flex flex-col gap-4">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.08));border:1px solid rgba(56,217,217,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white mb-1">Fully Offline</h3>
+            <p class="text-sm" style="color:#4e6280;line-height:1.75;">Whisper AI runs entirely on your machine. Your files never leave your computer — no uploads, no accounts, no API keys required after the initial model download.</p>
+          </div>
+        </div>
+
+        <!-- Feature card: Batch -->
+        <div class="card-bg rounded-2xl p-6 flex flex-col gap-4">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.08));border:1px solid rgba(56,217,217,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white mb-1">Batch Processing Queue</h3>
+            <p class="text-sm" style="color:#4e6280;line-height:1.75;">Add as many files as you need and let SRT Maker work through them automatically. Each .srt file is saved next to its source with a single click to reveal in Explorer or Finder.</p>
+          </div>
+        </div>
+
+        <!-- Feature card: Languages -->
+        <div class="card-bg rounded-2xl p-6 flex flex-col gap-4">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.08));border:1px solid rgba(56,217,217,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white mb-1">Multilingual Support</h3>
+            <p class="text-sm" style="color:#4e6280;line-height:1.75;">Choose from <strong style="color:#6e8aaa;">Italian, German, French</strong> and <strong style="color:#6e8aaa;">English</strong>, or let Auto-detect figure it out. Whisper large-v3 handles accented speech and mixed audio accurately.</p>
+          </div>
+        </div>
+
+        <!-- Feature card: Quality -->
+        <div class="card-bg rounded-2xl p-6 flex flex-col gap-4">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.08));border:1px solid rgba(56,217,217,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white mb-1">Three Quality Modes</h3>
+            <p class="text-sm" style="color:#4e6280;line-height:1.75;"><strong style="color:#6e8aaa;">Fast</strong> for quick drafts, <strong style="color:#6e8aaa;">Balanced</strong> for everyday use, and <strong style="color:#6e8aaa;">Best</strong> (Whisper large-v3) for maximum accuracy on complex or accented audio.</p>
+          </div>
+        </div>
+
+        <!-- Feature card: Drag & Drop -->
+        <div class="card-bg rounded-2xl p-6 flex flex-col gap-4">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.08));border:1px solid rgba(56,217,217,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white mb-1">Drag &amp; Drop Anywhere</h3>
+            <p class="text-sm" style="color:#4e6280;line-height:1.75;">Drag files directly from Explorer or Finder onto the app window. Or use the file picker. The .srt is saved right next to your original file — no extra steps.</p>
+          </div>
+        </div>
+
+        <!-- Feature card: Formats -->
+        <div class="card-bg rounded-2xl p-6 flex flex-col gap-4">
+          <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.08));border:1px solid rgba(56,217,217,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-white mb-1">Wide Format Support</h3>
+            <p class="text-sm" style="color:#4e6280;line-height:1.75;">Works with <strong style="color:#6e8aaa;">MP4, MKV, MOV, AVI, WebM, MP3, WAV, M4A, FLAC</strong> and AAC. If ffmpeg can read it, SRT Maker can transcribe it.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section id="download" class="py-16 px-6" style="border-top:1px solid #0f1e30;">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#38d9d9;" class="mb-3 block">Download</span>
+        <h2 class="text-3xl font-extrabold text-white mb-4" style="letter-spacing:-.01em;">Free for Windows &amp; Mac</h2>
+        <p class="text-sm" style="color:#4e6280;max-width:420px;margin:0 auto;line-height:1.75;">
+          SRT Maker is a free desktop app. No installer needed on Mac — just open and run.
+          Windows requires ffmpeg on your PATH for video files.
+        </p>
+      </div>
+
+      <div class="flex flex-col md:flex-row gap-6 max-w-2xl mx-auto">
+
+        <!-- Windows -->
+        <div class="platform-card">
+          <div class="flex items-center gap-3">
+            <div style="width:38px;height:38px;background:rgba(91,141,238,.1);border:1px solid rgba(91,141,238,.25);border-radius:9px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#5b8dee">
+                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+              </svg>
+            </div>
+            <div>
+              <div class="font-semibold text-white text-sm">Windows</div>
+              <div style="font-size:11px;color:#4e6280;">Windows 10 / 11 · 64-bit</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-tag">PyInstaller .exe</span>
+            <span class="skill-tag">No install</span>
+            <span class="skill-tag">CPU inference</span>
+          </div>
+          <div style="padding:12px;background:#0a1520;border-radius:7px;border:1px solid #1a2d47;">
+            <div style="font-size:10px;color:#4e6280;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;">Prerequisite</div>
+            <div style="font-size:12px;color:#6e8aaa;line-height:1.6;">Install <strong style="color:#a0b8d0;">ffmpeg</strong> and add it to your system PATH. Download from <span style="color:#38d9d9;">ffmpeg.org</span>.</div>
+          </div>
+          <a href="#" class="teal-btn px-5 py-3 rounded-xl font-semibold text-sm" style="display:block;text-align:center;letter-spacing:.02em;">
+            Download for Windows →
+          </a>
+        </div>
+
+        <!-- Mac -->
+        <div class="platform-card">
+          <div class="flex items-center gap-3">
+            <div style="width:38px;height:38px;background:rgba(56,217,217,.08);border:1px solid rgba(56,217,217,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#38d9d9">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="font-semibold text-white text-sm">macOS</div>
+              <div style="font-size:11px;color:#4e6280;">Apple Silicon (M1 / M2 / M3 / M4)</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-tag">Neural Engine</span>
+            <span class="skill-tag">mlx-whisper</span>
+            <span class="skill-tag">Called "Libretto"</span>
+          </div>
+          <div style="padding:12px;background:#0a1520;border-radius:7px;border:1px solid #1a2d47;">
+            <div style="font-size:10px;color:#4e6280;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;">Note</div>
+            <div style="font-size:12px;color:#6e8aaa;line-height:1.6;">The Mac version uses Apple's Neural Engine via <strong style="color:#a0b8d0;">mlx-whisper</strong> and is branded <strong style="color:#a0b8d0;">Libretto</strong>. Install via the included <code style="color:#38d9d9;">install.sh</code> script.</div>
+          </div>
+          <a href="#" class="teal-btn px-5 py-3 rounded-xl font-semibold text-sm" style="display:block;text-align:center;letter-spacing:.02em;">
+            Download for Mac →
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 px-6 text-center" style="border-top:1px solid #0f1e30;">
+    <p style="font-size:12px;color:#4e6280;">
+      SRT Maker is a free tool by <a href="../index.html" style="color:#38d9d9;text-decoration:none;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">Dynamic Vibe Productions</a>.
+      Powered by <a href="https://openai.com/research/whisper" target="_blank" style="color:#6e8aaa;text-decoration:none;">OpenAI Whisper</a>.
+    </p>
+  </footer>
+
+</body>
+</html>

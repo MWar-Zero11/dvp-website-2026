@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CinePrompt — DVP AI Prompt Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #ff7338;
+    --gold-dim: #cc5a28;
+    --gold-glow: rgba(255,115,56,0.15);
+    --bg: #060d18;
+    --bg2: #0b1523;
+    --bg3: #0d1929;
+    --bg4: #112235;
+    --border: rgba(26,45,71,0.9);
+    --border-hover: rgba(255,45,120,0.4);
+    --text: #dde8f8;
+    --text-dim: #6e8aaa;
+    --text-mid: #a0b8d0;
+    --red: #e05252;
+    --kling: #e8724a;
+    --runway: #5b8dee;
+    --nano: #6dd68a;
+    --mj: #c47beb;
+    --seedance: #38d9d9;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Film grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Ambient glow top */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255,45,120,0.08) 0%, rgba(255,115,56,0.04) 50%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 48px 0 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-icon svg { width: 20px; height: 20px; fill: var(--gold); }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    letter-spacing: 0.08em;
+    color: #fff;
+    line-height: 1;
+  }
+
+  h1 span { color: var(--gold); }
+
+  .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* ── SECTION LABELS ── */
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── PLATFORM CARDS ── */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+
+  .platform-card {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .platform-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .platform-card label {
+    display: block;
+    padding: 14px 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .platform-card label:hover {
+    border-color: var(--border-hover);
+    background: var(--bg4);
+  }
+
+  .platform-card input:checked + label {
+    border-color: var(--gold);
+    background: rgba(255,115,56,0.08);
+    box-shadow: 0 0 0 1px rgba(255,115,56,0.2), inset 0 0 20px rgba(255,115,56,0.04);
+  }
+
+  .p-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    color: #fff;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .p-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .p-desc {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 5px;
+    display: block;
+    line-height: 1.3;
+  }
+
+  .badge-kling    { background: rgba(232,114,74,0.15);  color: var(--kling); }
+  .badge-runway   { background: rgba(91,141,238,0.15);  color: var(--runway); }
+  .badge-nano     { background: rgba(109,214,138,0.15); color: var(--nano); }
+  .badge-mj       { background: rgba(196,123,235,0.15); color: var(--mj); }
+  .badge-seedance { background: rgba(56,217,217,0.15);  color: var(--seedance); }
+
+  /* ── TEXTAREA ── */
+  .prompt-wrap { margin-bottom: 32px; }
+
+  textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 16px 18px;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  textarea::placeholder { color: var(--text-dim); }
+
+  textarea:focus {
+    border-color: rgba(255,115,56,0.5);
+    box-shadow: 0 0 0 3px rgba(255,115,56,0.07);
+  }
+
+  textarea.shake { animation: shake 0.4s ease; border-color: var(--red) !important; }
+  .field-error { color: var(--red); font-size: 0.78rem; margin-top: 6px; display: none; }
+  .field-error.visible { display: block; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  /* ── DROPDOWN GRID ── */
+  .dropdown-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .field-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .select-wrap { position: relative; }
+
+  select {
+    appearance: none;
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    padding: 10px 36px 10px 13px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  select:focus {
+    border-color: rgba(255,115,56,0.5);
+    box-shadow: 0 0 0 3px rgba(255,115,56,0.07);
+  }
+
+  select:hover { border-color: rgba(255,255,255,0.15); }
+
+  select option { background: #112235; color: var(--text); }
+
+  .select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-dim);
+  }
+
+  .select-arrow svg { width: 14px; height: 14px; }
+
+  /* ── FILM TEXTURE CHIPS ── */
+  .chips-wrap { margin-bottom: 32px; }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .chip {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .chip input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .chip label {
+    display: block;
+    padding: 6px 13px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .chip label:hover { border-color: rgba(212,168,83,0.3); color: var(--text); }
+
+  .chip input:checked + label {
+    background: rgba(255,115,56,0.12);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ── GENERATE BUTTON ── */
+  .generate-wrap { margin-bottom: 48px; }
+
+  .btn-generate {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #ff7338, #ff2d78, #ff7338);
+    background-size: 200% 100%;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.18em;
+    color: #fff;
+    cursor: pointer;
+    transition: background-position 0.4s, transform 0.15s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-generate::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s;
+  }
+
+  .btn-generate:hover::before { left: 150%; }
+  .btn-generate:hover {
+    background-position: 100% 0;
+    box-shadow: 0 4px 30px rgba(255,45,120,0.4);
+    transform: translateY(-1px);
+  }
+  .btn-generate:active { transform: translateY(0); }
+
+  /* ── OUTPUT PANEL ── */
+  #output-panel {
+    display: none;
+    margin-bottom: 60px;
+    animation: fadeSlideIn 0.4s ease;
+  }
+
+  #output-panel.visible { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .output-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .output-header-left { display: flex; align-items: center; gap: 10px; }
+
+  .output-platform-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .output-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+
+  .char-count {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .output-body { padding: 24px 20px; }
+
+  #generated-prompt {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .output-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .btn-copy {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,115,56,0.1);
+    border: 1px solid rgba(255,115,56,0.3);
+    border-radius: 6px;
+    color: var(--gold);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-copy:hover {
+    background: rgba(255,115,56,0.2);
+    border-color: var(--gold);
+  }
+
+  .btn-copy svg { width: 14px; height: 14px; }
+
+  .btn-regen {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: color 0.2s, text-decoration-color 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-regen:hover { color: var(--text); text-decoration-color: var(--text-dim); }
+
+  /* ── WARNINGS ── */
+  .warning-row {
+    background: rgba(255,202,40,0.07);
+    border: 1px solid rgba(255,202,40,0.2);
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-size: 0.78rem;
+    color: rgba(255,202,40,0.85);
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .warning-row.visible { display: block; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 36px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 24px 0 36px;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── FULL-WIDTH FIELD ── */
+  .full-width { grid-column: 1 / -1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .platform-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 700px) {
+    .platform-grid { grid-template-columns: 1fr 1fr; }
+    .dropdown-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; }
+  }
+
+  @media (max-width: 420px) {
+    .platform-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav style="background:rgba(6,13,24,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(26,45,71,0.6);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;">
+  <a href="../index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <img src="../images/DVP_LOGO UseMe.jpg" alt="DVP" style="width:30px;height:30px;border-radius:7px;object-fit:cover;">
+    <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.875rem;color:#dde8f8;">DynamicVibe <span style="background:linear-gradient(135deg,#ff7338,#ff2d78);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Productions</span></span>
+  </a>
+  <a href="../index.html" style="font-family:'DM Sans',sans-serif;font-size:0.8rem;color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">← Back to main site</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+      </div>
+      <h1>Cine<span>Prompt</span></h1>
+    </div>
+    <p class="subtitle">Cinematic AI Prompt Builder · Kling · Runway · Nano Banana · Midjourney</p>
+  </header>
+
+  <!-- STEP 1: PLATFORM -->
+  <div class="section-label">01 &nbsp; Select Platform</div>
+  <div class="platform-grid" id="platform-grid">
+
+    <div class="platform-card">
+      <input type="radio" name="platform" id="p-kling" value="kling" checked>
+      <label for="p-kling">
+        <span class="p-name">Kling 3.0</span>
+        <span class="p-badge badge-kling">Video</span>
+        <span class="p-desc">Photorealistic 4K/60fps, precise camera control</span>
+      </label>
+    </div>
+
+    <div class="platform-card">
+      <input type="radio" name="platform" id="p-runway" value="runway">
+      <label for="p-runway">
+        <span class="p-name">Runway Gen-4</span>
+        <span class="p-badge badge-runway">Video</span>
+        <span class="p-desc">Stylized VFX, Director Mode, fast iteration</span>
+      </label>
+    </div>
+
+    <div class="platform-card">
+      <input type="radio" name="platform" id="p-nano" value="nano">
+      <label for="p-nano">
+        <span class="p-name">Nano Banana 2</span>
+        <span class="p-badge badge-nano">Image / Video</span>
+        <span class="p-desc">Thinking model, character consistency</span>
+      </label>
+    </div>
+
+    <div class="platform-card">
+      <input type="radio" name="platform" id="p-mj" value="midjourney">
+      <label for="p-mj">
+        <span class="p-name">Midjourney V7</span>
+        <span class="p-badge badge-mj">Image</span>
+        <span class="p-desc">Stunning stills, keyframes, unique aesthetics</span>
+      </label>
+    </div>
+
+    <div class="platform-card">
+      <input type="radio" name="platform" id="p-seedance" value="seedance">
+      <label for="p-seedance">
+        <span class="p-name">Seedance 2.0</span>
+        <span class="p-badge badge-seedance">Video · Audio</span>
+        <span class="p-desc">ByteDance multimodal — director-style shot lists, @tag references</span>
+      </label>
+    </div>
+
+  </div>
+
+  <!-- STEP 2: SCENE DESCRIPTION -->
+  <div class="section-label">02 &nbsp; Describe Your Scene</div>
+  <div class="prompt-wrap">
+    <textarea id="basic-prompt" rows="4" placeholder="Describe your scene, subject, or idea... e.g. 'a lone detective walks through rain-soaked streets at night'"></textarea>
+    <div class="field-error" id="prompt-error">Please describe your scene before generating.</div>
+  </div>
+
+  <!-- STEP 3: CAMERA & LENS -->
+  <div class="section-label">03 &nbsp; Camera &amp; Optics</div>
+  <div class="dropdown-grid">
+
+    <div class="field-group">
+      <label for="camera-body">Camera Body</label>
+      <div class="select-wrap">
+        <select id="camera-body">
+          <option value="">— Select Camera —</option>
+          <option value="ARRI Alexa Mini LF">ARRI Alexa Mini LF — Prestige cinema standard</option>
+          <option value="RED Monstro 8K">RED Monstro 8K — Epic / sci-fi, ultra-sharp</option>
+          <option value="Sony Venice 2">Sony Venice 2 — Natural skin tones, versatile</option>
+          <option value="Canon EOS R5">Canon EOS R5 — Portrait / editorial, warm</option>
+          <option value="Blackmagic URSA 12K">Blackmagic URSA 12K — Indie / documentary</option>
+          <option value="Phase One 645Z">Phase One 645Z — Luxury fashion / commercial</option>
+          <option value="Sony FX9">Sony FX9 — Documentary / run-and-gun</option>
+          <option value="Panavision DXL2">Panavision DXL2 — Classic Hollywood anamorphic</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="prime-lens">Prime Lens</label>
+      <div class="select-wrap">
+        <select id="prime-lens">
+          <option value="">— Select Lens —</option>
+          <option value="14mm ultra-wide">14mm ultra-wide — extreme distortion, immersive</option>
+          <option value="24mm wide">24mm wide — landscapes, epic "hero in vast world"</option>
+          <option value="35mm">35mm — natural, documentary, balanced interiors</option>
+          <option value="50mm">50mm — neutral, closest to the human eye</option>
+          <option value="85mm">85mm — portrait compression, creamy bokeh</option>
+          <option value="100mm macro">100mm macro — extreme detail, product, texture</option>
+          <option value="135mm telephoto">135mm telephoto — compressed backgrounds, elegant</option>
+          <option value="200mm telephoto">200mm telephoto — heavy compression, wildlife, sport</option>
+          <option value="anamorphic">Anamorphic — horizontal lens flares, oval bokeh, scope</option>
+          <option value="tilt-shift">Tilt-shift — miniature effect, selective focus plane</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="aperture">Aperture / Depth of Field</label>
+      <div class="select-wrap">
+        <select id="aperture">
+          <option value="">— Select Aperture —</option>
+          <option value="f/1.2, extremely shallow DOF, heavy bokeh">f/1.2 — Extremely shallow, heavy bokeh</option>
+          <option value="f/1.4, very shallow DOF, soft background">f/1.4 — Very shallow, buttery background</option>
+          <option value="f/1.8, shallow DOF, bokeh background">f/1.8 — Shallow, bokeh background</option>
+          <option value="f/2.8, moderate DOF, soft background separation">f/2.8 — Moderate, subject separation</option>
+          <option value="f/4.0, balanced DOF">f/4.0 — Balanced depth of field</option>
+          <option value="f/5.6, deep DOF, sharp midground">f/5.6 — Deep, sharp to midground</option>
+          <option value="f/8.0, deep focus, sharp throughout">f/8.0 — Deep focus, sharp throughout</option>
+          <option value="f/11, maximum depth of field, everything sharp">f/11 — Maximum DOF, everything sharp</option>
+          <option value="rack focus from foreground to background">Rack focus — foreground to background pull</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="focal-length-feel">Focal Feel / Distortion</label>
+      <div class="select-wrap">
+        <select id="focal-length-feel">
+          <option value="">— Select Feel —</option>
+          <option value="natural perspective, no distortion">Natural perspective — no distortion</option>
+          <option value="slight wide-angle barrel distortion">Slight barrel distortion — wide immersion</option>
+          <option value="heavy perspective distortion, dramatic">Heavy perspective distortion — dramatic</option>
+          <option value="telephoto compression, flattened depth">Telephoto compression — flattened planes</option>
+          <option value="anamorphic oval bokeh and horizontal flares">Anamorphic — oval bokeh, horizontal flares</option>
+          <option value="tilt-shift selective focus plane">Tilt-shift — selective focus plane</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STEP 4: SHOT & MOVEMENT -->
+  <div class="section-label">04 &nbsp; Shot &amp; Camera Movement</div>
+  <div class="dropdown-grid">
+
+    <div class="field-group">
+      <label for="shot-type">Shot Type / Framing</label>
+      <div class="select-wrap">
+        <select id="shot-type">
+          <option value="">— Select Shot —</option>
+          <option value="extreme close-up (ECU)">Extreme Close-up (ECU)</option>
+          <option value="close-up (CU)">Close-up (CU)</option>
+          <option value="medium close-up (MCU)">Medium Close-up (MCU)</option>
+          <option value="medium shot (MS)">Medium Shot (MS)</option>
+          <option value="medium wide shot (MWS)">Medium Wide (MWS)</option>
+          <option value="wide shot (WS)">Wide Shot (WS)</option>
+          <option value="extreme wide shot (EWS)">Extreme Wide (EWS)</option>
+          <option value="low angle shot">Low Angle</option>
+          <option value="high angle shot">High Angle</option>
+          <option value="Dutch angle / canted frame">Dutch / Canted Angle</option>
+          <option value="bird's eye view">Bird's Eye View</option>
+          <option value="worm's eye view">Worm's Eye View</option>
+          <option value="over-the-shoulder shot">Over-the-Shoulder</option>
+          <option value="POV shot">POV Shot</option>
+          <option value="two-shot">Two-Shot</option>
+          <option value="insert / detail shot">Insert / Detail Shot</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="camera-movement">Camera Movement</label>
+      <div class="select-wrap">
+        <select id="camera-movement">
+          <option value="">— Select Movement —</option>
+          <option value="static, locked-off on tripod">Static / Locked-off</option>
+          <option value="slow dolly push in">Slow dolly push in</option>
+          <option value="slow dolly pull back">Slow dolly pull back</option>
+          <option value="tracking shot alongside subject">Tracking alongside subject</option>
+          <option value="handheld, shoulder-cam drift">Handheld / shoulder-cam drift</option>
+          <option value="Steadicam glide">Steadicam glide</option>
+          <option value="crane / jib up">Crane / jib up</option>
+          <option value="crane / jib down">Crane / jib down</option>
+          <option value="aerial drone pull-back">Aerial drone pull-back</option>
+          <option value="aerial drone push in">Aerial drone push in</option>
+          <option value="aerial drone descent">Aerial drone descent</option>
+          <option value="slow 360-degree orbit around subject">Slow 360-degree orbit</option>
+          <option value="whip-pan">Whip-pan</option>
+          <option value="crash zoom">Crash zoom</option>
+          <option value="snap focus / rack focus">Snap / rack focus</option>
+          <option value="pan left to right">Pan left to right</option>
+          <option value="tilt up">Tilt up</option>
+          <option value="tilt down">Tilt down</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="camera-speed">Camera / Action Speed</label>
+      <div class="select-wrap">
+        <select id="camera-speed">
+          <option value="">— Select Speed —</option>
+          <option value="real-time, 24fps cinematic">Real-time — 24fps cinematic</option>
+          <option value="slow motion, 120fps">Slow motion — 120fps</option>
+          <option value="extreme slow motion, 240fps">Extreme slow motion — 240fps</option>
+          <option value="ultra slow motion, 1000fps phantom">Ultra slow motion — Phantom 1000fps</option>
+          <option value="slight slow motion, 48fps">Slight slow motion — 48fps</option>
+          <option value="time-lapse">Time-lapse</option>
+          <option value="hyperlapse">Hyperlapse</option>
+          <option value="overcranked, dreamy speed">Overcranked — dreamy</option>
+          <option value="undercranked, frenetic energy">Undercranked — frenetic energy</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="scene-depth">Scene Composition / Depth</label>
+      <div class="select-wrap">
+        <select id="scene-depth">
+          <option value="">— Select Composition —</option>
+          <option value="rule of thirds composition">Rule of thirds</option>
+          <option value="centered symmetrical composition">Centered symmetry</option>
+          <option value="dynamic diagonal composition">Dynamic diagonal</option>
+          <option value="leading lines drawing to subject">Leading lines to subject</option>
+          <option value="foreground framing elements, layered depth">Foreground framing, layered depth</option>
+          <option value="negative space dominant, isolated subject">Negative space dominant</option>
+          <option value="tight framing, no negative space">Tight framing, claustrophobic</option>
+          <option value="overlapping planes, complex depth">Overlapping planes, complex depth</option>
+          <option value="silhouette against bright background">Silhouette against bright BG</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STEP 5: LIGHTING -->
+  <div class="section-label">05 &nbsp; Lighting</div>
+  <div class="dropdown-grid">
+
+    <div class="field-group">
+      <label for="lighting-mood">Lighting Mood / Source</label>
+      <div class="select-wrap">
+        <select id="lighting-mood">
+          <option value="">— Select Lighting —</option>
+          <option value="golden hour, warm amber sunlight raking from the horizon">Golden hour — warm amber sunlight</option>
+          <option value="blue hour, cool dusk atmosphere, twilight sky">Blue hour — cool dusk atmosphere</option>
+          <option value="neon noir, mixed colored practical lights, reflections on wet surfaces">Neon noir — colored practicals</option>
+          <option value="candlelight, warm intimate flicker, soft shadows">Candlelight — warm intimate flicker</option>
+          <option value="overcast, flat soft diffused daylight, no hard shadows">Overcast — flat soft diffused</option>
+          <option value="chiaroscuro, hard dramatic shadows, high contrast key light">Chiaroscuro — hard dramatic shadows</option>
+          <option value="volumetric god rays, atmospheric haze, light shafts">Volumetric — god rays, light shafts</option>
+          <option value="studio strobe, clean even light, minimal shadows">Studio strobe — clean commercial</option>
+          <option value="moonlight, cool blue night ambient, deep shadows">Moonlight — cool blue night</option>
+          <option value="firelight, flickering orange glow, dancing shadows">Firelight — orange flicker glow</option>
+          <option value="harsh midday sun, bleached highlights, deep shadows">Harsh midday sun — bleached</option>
+          <option value="underwater caustic light, rippling patterns">Underwater — caustic patterns</option>
+          <option value="storm light, dramatic grey-green atmosphere">Storm light — dramatic grey-green</option>
+          <option value="fluorescent overhead, clinical cold light, green tint">Fluorescent — clinical cold</option>
+          <option value="single practical bulb, moody low-key, deep blacks">Single practical bulb — moody</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="light-direction">Light Direction / Quality</label>
+      <div class="select-wrap">
+        <select id="light-direction">
+          <option value="">— Select Direction —</option>
+          <option value="backlight, rim light separating subject from background">Backlight / rim light</option>
+          <option value="45-degree key light, Rembrandt lighting pattern">45° key — Rembrandt pattern</option>
+          <option value="side light, dramatic split lighting">Side light — split dramatic</option>
+          <option value="front fill, flat even illumination">Front fill — flat even</option>
+          <option value="underlit, uplight from below, eerie">Underlit — from below, eerie</option>
+          <option value="top light, hard overhead key, deep eye shadows">Top light — overhead, deep shadows</option>
+          <option value="motivated practical light from window">Motivated — window light</option>
+          <option value="three-point lighting: key, fill, rim">Three-point — key, fill, rim</option>
+          <option value="silhouette, subject in total shadow against bright BG">Silhouette — subject in shadow</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="color-temp">Color Temperature</label>
+      <div class="select-wrap">
+        <select id="color-temp">
+          <option value="">— Select Color Temp —</option>
+          <option value="very warm tungsten, 2400K, deep amber">Very warm tungsten — 2400K deep amber</option>
+          <option value="warm tungsten, 2700K, amber glow">Warm tungsten — 2700K amber</option>
+          <option value="warm incandescent, 3200K">Warm incandescent — 3200K</option>
+          <option value="neutral balanced, 4000K">Neutral balanced — 4000K</option>
+          <option value="cool daylight, 5600K">Cool daylight — 5600K</option>
+          <option value="overcast cool, 6500K, blue-white">Overcast cool — 6500K</option>
+          <option value="deep blue, 8000K, cold night">Deep blue — 8000K cold</option>
+          <option value="mixed practical lights, warm-cool contrast">Mixed — warm-cool contrast</option>
+          <option value="green fluorescent tint, sickly">Green fluorescent tint</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="atmosphere">Atmosphere / Weather</label>
+      <div class="select-wrap">
+        <select id="atmosphere">
+          <option value="">— Select Atmosphere —</option>
+          <option value="clear air, crisp and sharp">Clear — crisp and sharp</option>
+          <option value="light haze, soft atmospheric perspective">Light haze — soft atmospheric</option>
+          <option value="heavy fog, thick mist, low visibility">Heavy fog / thick mist</option>
+          <option value="rain, wet surfaces, reflections in puddles">Rain — wet surfaces, puddle reflections</option>
+          <option value="smoke and embers, hot particle scatter">Smoke and embers</option>
+          <option value="dust particles floating in light shafts">Dust particles in light shafts</option>
+          <option value="snow falling, soft diffused winter light">Snow falling — soft winter</option>
+          <option value="heat haze shimmer, distorted horizon">Heat haze shimmer</option>
+          <option value="steam and condensation on surfaces">Steam and condensation</option>
+          <option value="underwater, light caustics rippling">Underwater — light caustics</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STEP 6: COLOR & GRADE -->
+  <div class="section-label">06 &nbsp; Color Grade &amp; Film Stock</div>
+  <div class="dropdown-grid">
+
+    <div class="field-group">
+      <label for="color-grade">Color Grade / Look</label>
+      <div class="select-wrap">
+        <select id="color-grade">
+          <option value="">— Select Grade —</option>
+          <option value="teal and orange grade, Hollywood blockbuster LUT">Teal &amp; Orange — Hollywood blockbuster</option>
+          <option value="Kodak Portra 400 look, analogue warmth, soft highlights">Kodak Portra 400 — analogue/indie</option>
+          <option value="Kodak Vision3 500T, classic cinema tones">Kodak Vision3 500T — classic cinema</option>
+          <option value="Fujifilm Velvia 50, vivid saturated colors">Fujifilm Velvia 50 — vivid saturated</option>
+          <option value="bleach bypass, gritty desaturated, retained silver">Bleach bypass — gritty desaturated</option>
+          <option value="high contrast monochrome, deep blacks, crisp whites">High contrast monochrome — noir</option>
+          <option value="warm sepia tones, vintage Kodachrome warmth">Warm sepia — vintage nostalgic</option>
+          <option value="cool blue-steel palette, thriller moodiness">Cool blue — thriller / sci-fi</option>
+          <option value="desaturated muted palette, arthouse indie restraint">Desaturated muted — arthouse</option>
+          <option value="Kodachrome 64, period warmth, retro pop">Kodachrome 64 — period / retro</option>
+          <option value="Ektachrome E100, punchy slides, vivid pop">Ektachrome E100 — punchy vivid</option>
+          <option value="cross-processed, high contrast shifted colors">Cross-processed — shifted colors</option>
+          <option value="flat log grade, natural cinematic">Flat log grade — natural cinematic</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="contrast">Contrast &amp; Shadows</label>
+      <div class="select-wrap">
+        <select id="contrast">
+          <option value="">— Select Contrast —</option>
+          <option value="high contrast, crushed blacks, bright highlights">High contrast — crushed blacks</option>
+          <option value="medium contrast, balanced tonal range">Medium contrast — balanced</option>
+          <option value="low contrast, lifted shadows, milky blacks">Low contrast — lifted, milky</option>
+          <option value="flat, log-like, maximum dynamic range retained">Flat / log — max dynamic range</option>
+          <option value="extreme contrast, near silhouette">Extreme contrast — near silhouette</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="saturation">Saturation &amp; Vibrancy</label>
+      <div class="select-wrap">
+        <select id="saturation">
+          <option value="">— Select Saturation —</option>
+          <option value="highly saturated, vivid punchy colors">Highly saturated — vivid punchy</option>
+          <option value="moderately saturated, natural colors">Moderately saturated — natural</option>
+          <option value="muted desaturated palette">Muted desaturated — restrained</option>
+          <option value="near monochrome, barely any color">Near monochrome — barely any color</option>
+          <option value="full monochrome, black and white">Full monochrome — black and white</option>
+          <option value="selective color, one hue pops on desaturated BG">Selective color — one hue pops</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="tone-mood">Tone / Emotional Mood</label>
+      <div class="select-wrap">
+        <select id="tone-mood">
+          <option value="">— Select Mood —</option>
+          <option value="tense and foreboding, unsettling mood">Tense — foreboding, unsettling</option>
+          <option value="romantic and intimate, warm mood">Romantic — intimate, warm</option>
+          <option value="epic and grandiose, awe-inspiring">Epic — grandiose, awe-inspiring</option>
+          <option value="melancholic and contemplative, quiet sadness">Melancholic — quiet, contemplative</option>
+          <option value="energetic and kinetic, explosive action">Energetic — kinetic, action</option>
+          <option value="serene and meditative, peaceful stillness">Serene — meditative, peaceful</option>
+          <option value="gritty and raw, visceral realism">Gritty — raw, visceral realism</option>
+          <option value="mysterious and ethereal, dreamlike">Mysterious — ethereal, dreamlike</option>
+          <option value="hopeful and uplifting, warm optimism">Hopeful — warm optimism</option>
+          <option value="cold and clinical, detached sterility">Cold — clinical, detached</option>
+          <option value="nostalgic and wistful, faded memory">Nostalgic — wistful, faded</option>
+          <option value="playful and vibrant, joyful energy">Playful — vibrant, joyful</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STEP 7: FORMAT -->
+  <div class="section-label">07 &nbsp; Format &amp; Output</div>
+  <div class="dropdown-grid">
+
+    <div class="field-group">
+      <label for="aspect-ratio">Aspect Ratio</label>
+      <div class="select-wrap">
+        <select id="aspect-ratio">
+          <option value="">— Select Ratio —</option>
+          <option value="16:9" data-mj="16:9">16:9 — Standard widescreen</option>
+          <option value="2.39:1" data-mj="239:100">2.39:1 — Anamorphic scope</option>
+          <option value="2.35:1" data-mj="235:100">2.35:1 — Cinemascope</option>
+          <option value="1.85:1" data-mj="185:100">1.85:1 — Flat widescreen</option>
+          <option value="4:3" data-mj="4:3">4:3 — Classic / vintage</option>
+          <option value="1:1" data-mj="1:1">1:1 — Square</option>
+          <option value="9:16" data-mj="9:16">9:16 — Vertical / social</option>
+          <option value="3:2" data-mj="3:2">3:2 — Photography / editorial</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="resolution">Resolution</label>
+      <div class="select-wrap">
+        <select id="resolution">
+          <option value="">— Select Resolution —</option>
+          <option value="1080p Full HD">1080p — Full HD</option>
+          <option value="2K production">2K — Production standard</option>
+          <option value="4K Ultra HD">4K — Ultra HD</option>
+          <option value="6K cinema grade">6K — Cinema grade</option>
+          <option value="8K maximum detail">8K — Maximum detail</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="genre-style">Genre / Visual Style</label>
+      <div class="select-wrap">
+        <select id="genre-style">
+          <option value="">— Select Genre —</option>
+          <option value="prestige drama, naturalistic cinematography">Prestige drama — naturalistic</option>
+          <option value="sci-fi epic, otherworldly production design">Sci-fi epic — otherworldly</option>
+          <option value="film noir, expressionistic shadows">Film noir — expressionistic</option>
+          <option value="action blockbuster, visceral kinetic energy">Action blockbuster — kinetic</option>
+          <option value="horror, dread-building visuals">Horror — dread-building</option>
+          <option value="romantic drama, soft intimate frames">Romantic drama — soft intimate</option>
+          <option value="documentary, fly-on-the-wall realism">Documentary — fly-on-the-wall</option>
+          <option value="fashion / commercial, polished luxury">Fashion / commercial — polished</option>
+          <option value="music video, high-energy stylized">Music video — stylized, high-energy</option>
+          <option value="arthouse / experimental, abstract">Arthouse — abstract, experimental</option>
+          <option value="western, dusty epic landscapes">Western — dusty epic landscapes</option>
+          <option value="cyberpunk, neon dystopia, rain-slick streets">Cyberpunk — neon dystopia</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="time-period">Time Period / Era</label>
+      <div class="select-wrap">
+        <select id="time-period">
+          <option value="">— Select Era (optional) —</option>
+          <option value="contemporary, present day">Contemporary — present day</option>
+          <option value="near-future, 20-30 years ahead">Near future — 20-30 years ahead</option>
+          <option value="far future, advanced civilization">Far future — advanced civilization</option>
+          <option value="1990s aesthetic, VHS era warmth">1990s — VHS era warmth</option>
+          <option value="1980s, neon and synth aesthetic">1980s — neon and synth</option>
+          <option value="1970s, warm grain, organic feel">1970s — warm grain, organic</option>
+          <option value="1960s, mod, high contrast">1960s — mod, high contrast</option>
+          <option value="1950s, classic Hollywood glamour">1950s — classic Hollywood</option>
+          <option value="1940s, wartime, film noir era">1940s — wartime, film noir</option>
+          <option value="early 1900s, silent era, sepia">Early 1900s — silent era sepia</option>
+          <option value="medieval period, candlelit, rough textures">Medieval — candlelit, rough</option>
+          <option value="ancient world, natural light, raw earth tones">Ancient world — raw earth tones</option>
+        </select>
+        <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STEP 8: FILM TEXTURE CHIPS -->
+  <div class="section-label">08 &nbsp; Film Texture &amp; Imperfections <span style="font-family:'DM Sans';font-size:0.7rem;color:var(--text-dim);letter-spacing:0;font-weight:400;text-transform:none;">(select all that apply)</span></div>
+  <div class="chips-wrap">
+    <div class="chips">
+      <div class="chip"><input type="checkbox" id="tx-35mm" value="visible 35mm film grain"><label for="tx-35mm">35mm grain</label></div>
+      <div class="chip"><input type="checkbox" id="tx-16mm" value="heavy 16mm grain, gritty texture"><label for="tx-16mm">16mm grain</label></div>
+      <div class="chip"><input type="checkbox" id="tx-s8" value="Super 8 grain, warm organic texture"><label for="tx-s8">Super 8 grain</label></div>
+      <div class="chip"><input type="checkbox" id="tx-flare" value="anamorphic lens flares"><label for="tx-flare">Lens flare</label></div>
+      <div class="chip"><input type="checkbox" id="tx-halation" value="halation glow around highlights"><label for="tx-halation">Halation</label></div>
+      <div class="chip"><input type="checkbox" id="tx-ca" value="slight chromatic aberration at frame edges"><label for="tx-ca">Chromatic aberration</label></div>
+      <div class="chip"><input type="checkbox" id="tx-vignette" value="natural lens vignette"><label for="tx-vignette">Vignette</label></div>
+      <div class="chip"><input type="checkbox" id="tx-dust" value="dust particles floating in light"><label for="tx-dust">Dust particles</label></div>
+      <div class="chip"><input type="checkbox" id="tx-blur" value="natural motion blur on fast movement"><label for="tx-blur">Motion blur</label></div>
+      <div class="chip"><input type="checkbox" id="tx-scratch" value="occasional film scratches and gate weave"><label for="tx-scratch">Film scratches</label></div>
+      <div class="chip"><input type="checkbox" id="tx-flicker" value="slight projector flicker, organic feel"><label for="tx-flicker">Projector flicker</label></div>
+      <div class="chip"><input type="checkbox" id="tx-bloom" value="highlight bloom, soft overexposure glow"><label for="tx-bloom">Highlight bloom</label></div>
+    </div>
+  </div>
+
+  <!-- WARNINGS -->
+  <div class="warning-row" id="warning-row">
+    Some fields are unselected — generating with available values. Fill all fields for best results.
+  </div>
+
+  <!-- GENERATE -->
+  <div class="generate-wrap">
+    <button class="btn-generate" id="btn-generate">&#9654; &nbsp; GENERATE CINEMATIC PROMPT</button>
+  </div>
+
+  <!-- OUTPUT -->
+  <div id="output-panel">
+    <div class="section-label">Generated Prompt</div>
+    <div class="output-card">
+      <div class="output-header">
+        <div class="output-header-left">
+          <span class="output-platform-badge" id="output-badge">Kling 3.0</span>
+          <span class="output-label">CINEMATIC PROMPT READY</span>
+        </div>
+        <span class="char-count" id="char-count">0 characters</span>
+      </div>
+      <div class="output-body">
+        <div id="generated-prompt"></div>
+      </div>
+      <div class="output-footer">
+        <button class="btn-copy" id="btn-copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Prompt
+        </button>
+        <button class="btn-regen" id="btn-regen">Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>Built by <a href="../index.html" style="color:var(--gold);text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">DynamicVibe Productions</a> &nbsp;·&nbsp; CinePrompt 2026 &nbsp;·&nbsp; Kling · Runway · Nano Banana · Midjourney · Seedance</footer>
+
+</div><!-- /wrap -->
+
+<script>
+  // ── Platform badge colors
+  const platformMeta = {
+    kling:      { label: 'Kling 3.0',       color: '#e8724a', bg: 'rgba(232,114,74,0.15)' },
+    runway:     { label: 'Runway Gen-4',     color: '#5b8dee', bg: 'rgba(91,141,238,0.15)' },
+    nano:       { label: 'Nano Banana 2',    color: '#6dd68a', bg: 'rgba(109,214,138,0.15)' },
+    midjourney: { label: 'Midjourney V7',    color: '#c47beb', bg: 'rgba(196,123,235,0.15)' },
+    seedance:   { label: 'Seedance 2.0',     color: '#38d9d9', bg: 'rgba(56,217,217,0.15)' },
+  };
+
+  // ── Helpers
+  function val(id)  { return document.getElementById(id).value.trim(); }
+  function clean(s) { return s.replace(/^[\s,]+|[\s,]+$/g,'').replace(/,\s*,/g,','); }
+
+  function getTextures() {
+    const boxes = document.querySelectorAll('.chips input[type=checkbox]:checked');
+    return Array.from(boxes).map(b => b.value);
+  }
+
+  function getMJAspect() {
+    const sel = document.getElementById('aspect-ratio');
+    const opt = sel.options[sel.selectedIndex];
+    return opt ? (opt.getAttribute('data-mj') || val('aspect-ratio')) : '';
+  }
+
+  // ── Check missing fields (non-required but recommended)
+  function hasMissing() {
+    const ids = ['camera-body','prime-lens','aperture','shot-type','camera-movement',
+                 'lighting-mood','color-grade','aspect-ratio','resolution'];
+    return ids.some(id => !val(id));
+  }
+
+  // ── Build prompts
+  function buildKling(d) {
+    const parts = [];
+    if (d.movement) parts.push(d.movement + ' shot');
+    if (d.shot)     parts.push(d.shot);
+    if (d.basic)    parts.push(d.basic);
+    if (d.atmosphere) parts.push(d.atmosphere);
+    if (d.lighting) parts.push(d.lighting + ' lighting');
+    if (d.lightDir) parts.push(d.lightDir);
+    if (d.colorTemp) parts.push(d.colorTemp);
+    if (d.depth)    parts.push(d.depth);
+    if (d.speed)    parts.push(d.speed);
+    let tech = [];
+    if (d.camera)   tech.push('shot on ' + d.camera);
+    if (d.lens)     tech.push(d.lens + ' prime lens');
+    if (d.aperture) tech.push(d.aperture);
+    if (d.focalFeel) tech.push(d.focalFeel);
+    if (tech.length) parts.push(tech.join(', '));
+    if (d.grade)    parts.push(d.grade + ' color grade');
+    if (d.contrast) parts.push(d.contrast);
+    if (d.saturation) parts.push(d.saturation);
+    if (d.textures.length) parts.push(d.textures.join(', '));
+    if (d.aspect)   parts.push(d.aspect + ' aspect ratio');
+    if (d.res)      parts.push(d.res + ' resolution');
+    if (d.genre)    parts.push(d.genre);
+    if (d.era)      parts.push(d.era);
+    if (d.mood)     parts.push(d.mood);
+
+    let prompt = clean(parts.join(', ')) + '.';
+    prompt += '\n\nDescribe the action from start to finish as a single continuous take. Think like a Director of Photography — one unbroken sentence of physical, tactile detail.';
+    return prompt;
+  }
+
+  function buildRunway(d) {
+    const parts = [];
+    if (d.basic)    parts.push(d.basic);
+    if (d.movement) parts.push(d.movement);
+    if (d.shot)     parts.push(d.shot);
+    if (d.speed)    parts.push(d.speed);
+    if (d.depth)    parts.push(d.depth);
+    if (d.lighting) parts.push(d.lighting + ' lighting');
+    if (d.lightDir) parts.push(d.lightDir);
+    if (d.atmosphere) parts.push(d.atmosphere);
+    if (d.grade)    parts.push(d.grade + ' palette');
+    if (d.saturation) parts.push(d.saturation);
+    if (d.mood)     parts.push(d.mood);
+    const tech = [];
+    if (d.camera)   tech.push('shot on ' + d.camera);
+    if (d.lens)     tech.push(d.lens + ' lens');
+    if (d.aperture) tech.push(d.aperture);
+    if (tech.length) parts.push(tech.join(', '));
+    if (d.textures.length) parts.push(d.textures.join(', '));
+    if (d.aspect)   parts.push(d.aspect + ' frame');
+    if (d.genre)    parts.push(d.genre);
+    if (d.era)      parts.push(d.era);
+
+    return clean(parts.join('. ')) + '.';
+  }
+
+  function buildNano(d) {
+    let p = '';
+    const shotPart  = d.shot ? 'A ' + d.shot + ' of ' : 'A shot of ';
+    const movePart  = d.movement ? ', ' + d.movement : '';
+    p += shotPart + (d.basic || '[your subject]') + movePart + '. ';
+
+    const lightParts = [d.lighting, d.lightDir, d.colorTemp, d.atmosphere].filter(Boolean);
+    if (lightParts.length) p += lightParts.join(', ') + ' illuminates the scene. ';
+
+    if (d.depth)    p += d.depth + '. ';
+    if (d.speed)    p += d.speed + '. ';
+    if (d.mood)     p += 'The mood is ' + d.mood + '. ';
+    if (d.genre)    p += 'Visual style: ' + d.genre + '. ';
+    if (d.era)      p += d.era + '. ';
+
+    const gradeParts = [d.grade, d.contrast, d.saturation].filter(Boolean);
+    if (gradeParts.length) p += 'Color: ' + gradeParts.join(', ') + '. ';
+
+    const techParts = [];
+    if (d.camera)   techParts.push(d.camera);
+    if (d.lens)     techParts.push(d.lens + ' prime lens');
+    if (d.aperture) techParts.push(d.aperture);
+    if (d.focalFeel) techParts.push(d.focalFeel);
+    if (techParts.length) p += 'Captured on ' + techParts.join(', ') + '. ';
+
+    if (d.aspect)   p += d.aspect + ' aspect ratio. ';
+    if (d.res)      p += d.res + ' resolution. ';
+
+    const texAll = d.textures;
+    if (texAll.length) p += texAll.join(', ') + ' add analogue texture and physical realism to the final frame.';
+
+    return p.trim();
+  }
+
+  // ── Seedance 2.0 — Director-style shot list. Subject anchored in first 20 words.
+  // No negative prompts — use positive consistency constraints instead.
+  // Structure: Subject anchor → Action → Camera → Scene/atmosphere → Lighting → Style → Quality + Constraints.
+  function buildSeedance(d) {
+    // Pin subject first — Seedance weights the opening 20–30 words most heavily
+    let p = d.basic ? d.basic + '. ' : '[subject]. ';
+
+    // Camera move + speed in one beat
+    const moveStr = [d.movement, d.speed].filter(Boolean).join(', ');
+    if (moveStr) p += moveStr + '. ';
+
+    // Shot framing
+    if (d.shot) p += d.shot + '. ';
+
+    // Scene depth
+    if (d.depth) p += d.depth + '. ';
+
+    // Lighting block
+    const lightParts = [d.lighting, d.lightDir, d.colorTemp, d.atmosphere].filter(Boolean);
+    if (lightParts.length) p += lightParts.join(', ') + '. ';
+
+    // Camera tech
+    const tech = [];
+    if (d.camera)    tech.push('shot on ' + d.camera);
+    if (d.lens)      tech.push(d.lens + ' lens');
+    if (d.aperture)  tech.push(d.aperture);
+    if (d.focalFeel) tech.push(d.focalFeel);
+    if (tech.length) p += tech.join(', ') + '. ';
+
+    // Color
+    const colorParts = [d.grade, d.contrast, d.saturation].filter(Boolean);
+    if (colorParts.length) p += colorParts.join(', ') + '. ';
+
+    // Mood, genre, era
+    if (d.mood)  p += d.mood + '. ';
+    if (d.genre) p += d.genre + '. ';
+    if (d.era)   p += d.era + '. ';
+
+    // Texture overlays
+    if (d.textures.length) p += d.textures.join(', ') + '. ';
+
+    // Format
+    if (d.aspect) p += d.aspect + ' aspect ratio. ';
+    if (d.res)    p += d.res + '. ';
+
+    // Positive consistency constraints (Seedance does NOT support negative prompts)
+    p += '\nMaintain subject and clothing consistency throughout. Stable character face, natural proportions, smooth continuous motion. No subtitles, no watermarks.';
+
+    // Director note
+    p += '\n\n[Seedance 2.0 tip: Upload reference images/videos with @Image1 / @Video1 tags to anchor character appearance and motion style. Keep to 1–2 characters per shot. 2–3 shots per generation max.]';
+
+    return p.trim();
+  }
+
+  function buildMidjourney(d) {
+    const parts = [];
+    if (d.basic)    parts.push(d.basic);
+    if (d.shot)     parts.push(d.shot);
+    if (d.movement) parts.push(d.movement);
+    if (d.depth)    parts.push(d.depth);
+    if (d.lighting) parts.push(d.lighting + ' lighting');
+    if (d.lightDir) parts.push(d.lightDir);
+    if (d.colorTemp) parts.push(d.colorTemp);
+    if (d.atmosphere) parts.push(d.atmosphere);
+    if (d.mood)     parts.push(d.mood);
+    if (d.genre)    parts.push(d.genre);
+    if (d.era)      parts.push(d.era);
+    const tech = [];
+    if (d.camera)   tech.push('shot on ' + d.camera);
+    if (d.lens)     tech.push(d.lens + ' prime lens');
+    if (d.aperture) tech.push(d.aperture);
+    if (d.focalFeel) tech.push(d.focalFeel);
+    if (tech.length) parts.push(tech.join(', '));
+    if (d.grade)    parts.push(d.grade);
+    if (d.contrast) parts.push(d.contrast);
+    if (d.saturation) parts.push(d.saturation);
+    if (d.textures.length) parts.push(d.textures.join(', '));
+    if (d.aspect)   parts.push(d.aspect + ' aspect ratio');
+
+    const mjAr = d.mjAspect ? ' --ar ' + d.mjAspect : '';
+    return clean(parts.join(', ')) + mjAr + ' --style raw --s 200 --q 2 --v 7';
+  }
+
+  // ── Main generate
+  document.getElementById('btn-generate').addEventListener('click', generate);
+  document.getElementById('btn-regen').addEventListener('click', generate);
+
+  function generate() {
+    const basicEl = document.getElementById('basic-prompt');
+    const basic   = basicEl.value.trim();
+    const errEl   = document.getElementById('prompt-error');
+
+    if (!basic) {
+      basicEl.classList.add('shake');
+      errEl.classList.add('visible');
+      basicEl.addEventListener('animationend', () => basicEl.classList.remove('shake'), { once: true });
+      basicEl.focus();
+      return;
+    }
+    errEl.classList.remove('visible');
+
+    const missing = hasMissing();
+    document.getElementById('warning-row').classList.toggle('visible', missing);
+
+    // Collect all data
+    const d = {
+      basic:      basic,
+      platform:   document.querySelector('input[name="platform"]:checked').value,
+      camera:     val('camera-body'),
+      lens:       val('prime-lens'),
+      aperture:   val('aperture'),
+      focalFeel:  val('focal-length-feel'),
+      shot:       val('shot-type'),
+      movement:   val('camera-movement'),
+      speed:      val('camera-speed'),
+      depth:      val('scene-depth'),
+      lighting:   val('lighting-mood'),
+      lightDir:   val('light-direction'),
+      colorTemp:  val('color-temp'),
+      atmosphere: val('atmosphere'),
+      grade:      val('color-grade'),
+      contrast:   val('contrast'),
+      saturation: val('saturation'),
+      mood:       val('tone-mood'),
+      genre:      val('genre-style'),
+      era:        val('time-period'),
+      aspect:     val('aspect-ratio'),
+      res:        val('resolution'),
+      textures:   getTextures(),
+      mjAspect:   getMJAspect(),
+    };
+
+    let prompt = '';
+    if      (d.platform === 'kling')      prompt = buildKling(d);
+    else if (d.platform === 'runway')     prompt = buildRunway(d);
+    else if (d.platform === 'nano')       prompt = buildNano(d);
+    else if (d.platform === 'midjourney') prompt = buildMidjourney(d);
+    else if (d.platform === 'seedance')   prompt = buildSeedance(d);
+
+    // Update output panel
+    const meta = platformMeta[d.platform];
+    const badge = document.getElementById('output-badge');
+    badge.textContent = meta.label;
+    badge.style.color = meta.color;
+    badge.style.background = meta.bg;
+
+    document.getElementById('generated-prompt').textContent = prompt;
+    document.getElementById('char-count').textContent = prompt.length + ' characters';
+
+    const panel = document.getElementById('output-panel');
+    panel.classList.add('visible');
+    panel.style.animation = 'none';
+    requestAnimationFrame(() => {
+      panel.style.animation = '';
+    });
+
+    // Scroll to output
+    setTimeout(() => {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
+  // ── Copy
+  document.getElementById('btn-copy').addEventListener('click', function() {
+    const text = document.getElementById('generated-prompt').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      this.textContent = '✓  Copied!';
+      this.style.color = '#6dd68a';
+      this.style.borderColor = '#6dd68a';
+      setTimeout(() => {
+        this.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Prompt`;
+        this.style.color = '';
+        this.style.borderColor = '';
+      }, 2000);
+    });
+  });
+</script>
+</body>
+</html>

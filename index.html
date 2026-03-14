@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DynamicVibe Productions | Marc Warfield — Video Editor & AI Trainer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dvp-bg':     '#060d18',
+            'dvp-card':   '#0d1929',
+            'dvp-border': '#1a2d47',
+            'dvp-pink':   '#ff2d78',
+            'dvp-coral':  '#ff7338',
+            'dvp-gold':   '#ffca28',
+            'dvp-text':   '#dde8f8',
+            'dvp-muted':  '#6e8aaa',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #060d18;
+      color: #dde8f8;
+      font-family: 'Inter', sans-serif;
+      margin: 0; padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ── Gradient text ── */
+    .gradient-text {
+      background: linear-gradient(135deg, #ff7338 0%, #ff2d78 55%, #c91d6e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Glows ── */
+    .glow-hero {
+      background: radial-gradient(ellipse 90% 80% at 50% 10%,
+        rgba(255,45,120,0.22) 0%, rgba(255,115,56,0.08) 45%, transparent 70%);
+    }
+    .glow-section {
+      background: radial-gradient(ellipse 80% 60% at 50% 50%,
+        rgba(255,45,120,0.12) 0%, transparent 70%);
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      background: linear-gradient(135deg, #ff7338 0%, #ff2d78 100%);
+      color: #fff;
+      display: inline-block;
+      transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-secondary {
+      background: rgba(13,25,41,.8);
+      color: #dde8f8;
+      border: 1px solid #1a2d47;
+      display: inline-block;
+      transition: border-color .2s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,45,120,.5); }
+
+    /* ── Cards ── */
+    .card-bg {
+      background: #0d1929;
+      border: 1px solid #1a2d47;
+    }
+    .card-glow { transition: border-color .3s, box-shadow .3s; }
+    .card-glow:hover {
+      border-color: rgba(255,45,120,.35);
+      box-shadow: 0 0 24px rgba(255,45,120,.08);
+    }
+
+    /* ── Nav ── */
+    .nav-link { color: #6e8aaa; font-size: 14px; transition: color .2s; }
+    .nav-link:hover { color: #dde8f8; }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #ff7338;
+    }
+
+    /* ── Feature icon ── */
+    .feature-icon {
+      width: 38px; height: 38px;
+      background: rgba(255,45,120,.1);
+      border: 1px solid rgba(255,45,120,.25);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .service-icon {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, rgba(255,115,56,.12) 0%, rgba(255,45,120,.12) 100%);
+      border: 1px solid rgba(255,45,120,.28);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Dot grid ── */
+    .dot-grid {
+      background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* ── Pink section bg ── */
+    .pink-section-bg {
+      background: linear-gradient(180deg, #060d18 0%, #0c0d1c 30%, #13091e 55%, #0c0d1c 80%, #060d18 100%);
+    }
+
+    /* ── Skill tag ── */
+    .skill-tag {
+      background: rgba(255,45,120,.1);
+      border: 1px solid rgba(255,45,120,.22);
+      color: #ff7aa5;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── Stat ── */
+    .stat-number {
+      font-size: 2.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff7338 0%, #ff2d78 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    /* ── Skill bar ── */
+    .skill-bar { height: 3px; background: #1a2d47; border-radius: 2px; overflow: hidden; }
+    .skill-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff7338, #ff2d78);
+      border-radius: 2px;
+    }
+
+    /* ── Headshot ── */
+    .headshot-frame {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(255,45,120,.3);
+      box-shadow: 0 0 60px rgba(255,45,120,.14), 0 0 120px rgba(255,115,56,.07);
+    }
+
+    /* ================================================================
+       VIDEO CARD STRIP — Evervault-style auto-scroll + scramble
+    ================================================================ */
+    .card-strip-wrapper {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      cursor: default;
+      user-select: none;
+    }
+    /* Left & right edge fades */
+    .card-strip-wrapper::before,
+    .card-strip-wrapper::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 200px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .card-strip-wrapper::before {
+      left: 0;
+      background: linear-gradient(to right, #060d18 0%, transparent 100%);
+    }
+    .card-strip-wrapper::after {
+      right: 0;
+      background: linear-gradient(to left, #060d18 0%, transparent 100%);
+    }
+
+    /* The glowing scramble divider line — 30% from the right (70% from left) */
+    .scramble-line {
+      position: absolute;
+      left: 70%;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(255,45,120,.8) 20%,
+        rgba(255,115,56,.8) 50%,
+        rgba(255,45,120,.8) 80%,
+        transparent 100%);
+      z-index: 11;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(255,45,120,.5);
+    }
+    /* Label to the left of the line */
+    .scramble-line::after {
+      content: 'ENCRYPT';
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      left: auto;
+      transform: translateY(-50%);
+      font-size: 8px;
+      letter-spacing: .12em;
+      color: rgba(255,45,120,.6);
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .card-strip {
+      display: flex;
+      gap: 14px;
+      padding: 16px 24px;
+      width: max-content;
+      will-change: transform;
+    }
+
+    /* Each video card */
+    .video-card {
+      width: 290px;
+      height: 180px;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      border: 1px solid #1a2d47;
+      transition: border-color .3s;
+      cursor: pointer;
+    }
+    .video-card:not(.scrambled):hover { border-color: rgba(255,45,120,.45); }
+    .video-card.scrambled { cursor: not-allowed; }
+
+    .video-thumb {
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+    }
+    .video-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(6,13,24,.92) 0%, rgba(6,13,24,.3) 55%, transparent 100%);
+    }
+
+    /* Play button */
+    .play-btn {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,45,120,.2);
+      border: 1px solid rgba(255,45,120,.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .video-card:hover .play-btn {
+      background: rgba(255,45,120,.4);
+    }
+
+    .video-card-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 10px 12px;
+    }
+    .video-card-label {
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #ff7338;
+      margin-bottom: 2px;
+      font-family: inherit;
+      transition: color .15s;
+    }
+    .video-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.3;
+      font-family: inherit;
+    }
+
+    /* Scrambled state — canvas handles all visual encryption progressively */
+    .video-card.scrambled { cursor: not-allowed; }
+
+    /* ════════════════════════════════════════════════
+       DESIGN ELEVATION — Polish & New Effects
+    ════════════════════════════════════════════════ */
+
+    /* ── Page-load intro overlay ── */
+    #dvp-intro {
+      position: fixed; inset: 0; z-index: 9998;
+      background: #060d18;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #dvp-intro.dvp-fade-out {
+      animation: dvpIntroOut 0.8s cubic-bezier(0.4,0,0.8,1) forwards;
+    }
+    @keyframes dvpIntroOut { to { opacity: 0; } }
+    #dvp-intro-logo {
+      width: 112px; height: 112px; border-radius: 22px; object-fit: cover;
+      box-shadow: 0 0 60px rgba(255,115,56,.28), 0 0 120px rgba(255,45,120,.14);
+      opacity: 0;
+      animation: dvpIntroIn 1.1s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+    }
+    @keyframes dvpIntroIn {
+      0%   { opacity: 0; transform: scale(0.7); }
+      60%  { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── Custom cursor (desktop/fine pointer only) ── */
+    @media (pointer: fine) {
+      body,
+      a, button, input, select, textarea,
+      .video-card, [role="button"] { cursor: none !important; }
+    }
+    #dvp-cursor {
+      position: fixed; z-index: 99997; pointer-events: none;
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1.5px solid rgba(255,115,56,.7);
+      background: rgba(6,13,24,.3);
+      transform: translate(-50%,-50%);
+      transition: width .2s ease, height .2s ease,
+                  border-color .2s ease, background .2s ease;
+      display: flex; align-items: center; justify-content: center;
+      left: -100px; top: -100px;
+    }
+    #dvp-cursor.c-play {
+      width: 64px; height: 64px;
+      border-color: rgba(255,45,120,.9);
+      background: rgba(255,45,120,.1);
+    }
+    #dvp-cursor.c-cta {
+      width: 50px; height: 50px;
+      border-color: rgba(255,115,56,.9);
+      background: rgba(255,115,56,.08);
+    }
+    #dvp-cursor.c-text {
+      width: 4px; height: 4px;
+      border-color: rgba(255,220,235,.7);
+    }
+    #dvp-cursor-label {
+      font-size: 8px; letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,200,220,.9);
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      white-space: nowrap; opacity: 0; transition: opacity .12s;
+    }
+    #dvp-cursor.c-play #dvp-cursor-label,
+    #dvp-cursor.c-cta  #dvp-cursor-label { opacity: 1; }
+
+    /* ── Hero h1 entrance animation ── */
+    .hero-h1 {
+      animation: heroH1In 1.5s cubic-bezier(0.22,1,0.36,1) 1.0s both;
+    }
+    @keyframes heroH1In {
+      0%   { opacity: 0; transform: translateY(16px); letter-spacing: -0.1em; }
+      38%  { opacity: 1; }
+      100% { opacity: 1; transform: translateY(0); letter-spacing: -0.035em; }
+    }
+
+    /* ── Nav brand reveal on scroll ── */
+    #nav-brand {
+      opacity: 0; transform: translateY(-7px);
+      transition: opacity .38s ease, transform .38s ease;
+      pointer-events: none;
+    }
+    #nav-brand.nav-brand-show {
+      opacity: 1; transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* ── Nav active section indicator ── */
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 50%; right: 50%;
+      height: 1.5px;
+      background: linear-gradient(90deg, #ff7338, #ff2d78);
+      border-radius: 2px;
+      transition: left .28s ease, right .28s ease;
+    }
+    .nav-link.nav-active { color: #dde8f8; }
+    .nav-link.nav-active::after { left: 0; right: 0; }
+
+    /* ── Scroll reveal ── */
+    .rv {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .rv.in { opacity: 1; transform: translateY(0); }
+
+    /* ── Scramble line — pulsing glow ── */
+    .scramble-line { animation: slPulse 3s ease-in-out infinite; }
+    @keyframes slPulse {
+      0%,100% { box-shadow: 0 0 10px rgba(255,45,120,.45); }
+      50%      { box-shadow: 0 0 28px rgba(255,45,120,.9), 0 0 52px rgba(255,115,56,.32); }
+    }
+    /* Scanline halo behind the line */
+    .scramble-line::before {
+      content: '';
+      position: absolute; top: 0; bottom: 0;
+      left: -16px; width: 32px;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0, transparent 4px,
+        rgba(255,45,120,.055) 4px, rgba(255,45,120,.055) 5px
+      );
+      pointer-events: none;
+    }
+    /* ENCRYPT label pulse */
+    .scramble-line::after {
+      animation: encPulse 3s ease-in-out infinite;
+    }
+    @keyframes encPulse {
+      0%,100% { color: rgba(255,45,120,.6); text-shadow: none; }
+      50%      { color: rgba(255,155,56,.95); text-shadow: 0 0 6px rgba(255,115,56,.6); }
+    }
+
+    /* ── Headshot hover glitch ── */
+    @keyframes hGlitch {
+      0%   { filter: none;                                              transform: translate(0,0); }
+      14%  { filter: hue-rotate(80deg)  saturate(1.9) brightness(1.1); transform: translate(3px,0); }
+      28%  { filter: hue-rotate(200deg) saturate(1.6);                 transform: translate(-2px,1px); }
+      42%  { filter: hue-rotate(310deg) saturate(2.1);                 transform: translate(2px,-1px); }
+      56%  { filter: none;                                              transform: translate(0,0); }
+      70%  { filter: hue-rotate(145deg) saturate(1.7);                 transform: translate(-1px,0); }
+      85%  { filter: none;                                              transform: translate(0,0); }
+      100% { filter: none;                                              transform: translate(0,0); }
+    }
+    .headshot-glitch:hover {
+      animation: hGlitch .32s steps(2) 1;
+    }
+
+    /* ── Hero watermark logo ── */
+    .hero-wm {
+      position: absolute; z-index: 2;
+      top: 46%; left: 50%; transform: translate(-50%,-50%);
+      width: 420px; height: 420px;
+      object-fit: contain; border-radius: 70px;
+      opacity: 0.038; filter: grayscale(1);
+      pointer-events: none; user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ PAGE INTRO OVERLAY ══════════════════════ -->
+<div id="dvp-intro">
+  <img id="dvp-intro-logo" src="images/DVP_LOGO UseMe.jpg" alt="DynamicVibe Productions" />
+</div>
+
+<!-- ══════════════════════ CUSTOM CURSOR ══════════════════════ -->
+<div id="dvp-cursor"><span id="dvp-cursor-label"></span></div>
+
+<!-- ══════════════════════ NAVIGATION ══════════════════════ -->
+<nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3"
+  style="background: rgba(6,13,24,.9); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(26,45,71,.55);">
+  <!-- Logo -->
+  <a href="#" id="nav-brand" class="flex items-center gap-3">
+    <img src="images/DVP_LOGO UseMe.jpg" alt="DVP Logo"
+      style="width:36px; height:36px; border-radius:8px; object-fit:cover;" />
+    <span class="font-bold text-white text-sm tracking-tight">
+      DynamicVibe <span class="gradient-text">Productions</span>
+    </span>
+  </a>
+  <!-- Nav links -->
+  <div class="hidden md:flex items-center gap-6">
+    <a href="#services"  class="nav-link">Services</a>
+    <a href="#ai-reel"   class="nav-link">AI Reel</a>
+    <a href="#portfolio" class="nav-link">Portfolio</a>
+    <a href="#tools"     class="nav-link">Tools</a>
+    <a href="#about"     class="nav-link">About</a>
+    <a href="#learning"  class="nav-link">Learning</a>
+    <a href="#contact"   class="nav-link">Contact</a>
+  </div>
+  <!-- CTA -->
+  <div class="flex items-center gap-3">
+    <a href="Resume/Marc_Warfield_CV_AI_2026-27.pdf" download
+      class="nav-link hidden md:inline text-sm px-4 py-1.5 rounded-md">Download CV</a>
+    <a href="#contact" class="btn-primary text-sm px-4 py-2 rounded-lg font-semibold">Hire Me</a>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<section class="relative min-h-screen flex flex-col items-center justify-center pt-20 pb-0 overflow-hidden"
+  style="background: linear-gradient(180deg, #060d18 0%, #09101f 50%, #060d18 100%);">
+  <div class="absolute inset-0 glow-hero pointer-events-none"></div>
+  <div class="absolute inset-0 dot-grid opacity-25 pointer-events-none"></div>
+  <!-- Hero watermark logo -->
+  <img src="images/DVP_LOGO UseMe.jpg" alt="" class="hero-wm" aria-hidden="true" />
+
+  <!-- Hero copy -->
+  <div class="relative z-10 text-center max-w-3xl mx-auto px-6 mb-14">
+    <!-- "Available" badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8"
+      style="background: rgba(255,45,120,.10); border: 1px solid rgba(255,45,120,.30);">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background:#ff2d78;"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2" style="background:#ff2d78;"></span>
+      </span>
+      <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#ff7aa5;">Available for Projects</span>
+    </div>
+
+    <h1 class="flex flex-col mb-5 leading-none hero-h1" style="letter-spacing:-.04em;">
+      <span class="font-black text-white uppercase" style="font-size:clamp(3.2rem,8vw,5.2rem);">See. Cut.</span>
+      <span class="font-black uppercase gradient-text" style="font-size:clamp(3.2rem,8vw,5.2rem);">Evolve.</span>
+    </h1>
+    <p class="text-[13px] font-medium tracking-wide uppercase mb-6" style="color:#6e8aaa;">
+      Sports Video Editor &nbsp;·&nbsp; AI Filmmaker &nbsp;·&nbsp; AI Image &amp; Video Training Expert
+    </p>
+    <p class="text-sm mb-10 max-w-lg mx-auto" style="color:#4e6280; line-height:1.75;">
+      20+ years editing elite sports for international brands and broadcasters —
+      now pushing the craft further with AI filmmaking and expert visual AI training.
+    </p>
+    <div class="flex items-center justify-center gap-4 flex-wrap">
+      <a href="#portfolio" class="btn-primary px-7 py-3 rounded-full text-sm font-bold"
+        style="box-shadow: 0 4px 24px rgba(255,45,120,.25);">View My Work</a>
+      <a href="#contact"   class="btn-secondary px-7 py-3 rounded-full text-sm font-semibold">Get in Touch</a>
+    </div>
+  </div>
+
+  <!-- ── VIDEO CARD STRIP ── -->
+  <div class="relative z-10 w-full pb-20">
+    <p class="text-center text-xs mb-4" style="color:#2e4560; letter-spacing:.1em; text-transform:uppercase;">
+      Featured Work
+    </p>
+    <div class="card-strip-wrapper">
+      <div class="scramble-line"></div>
+      <div class="card-strip" id="cardStrip">
+
+        <!-- Card 1 — FIE Fencing Grand Prix -->
+        <div class="video-card" data-title="FIE Fencing Grand Prix — Sabre Tunis" data-label="Sports Promo" data-vimeo="1171813901">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1171813901?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="FIE Fencing Grand Prix — Sabre Tunis"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Sports Promo</div>
+            <div class="video-card-title">FIE Fencing Grand Prix — Sabre Tunis</div>
+          </div>
+        </div>
+
+        <!-- Card 2 — Karsten Warholm WR -->
+        <div class="video-card" data-title="Karsten Warholm — WR 400m Hurdles" data-label="Athletics" data-vimeo="1171808292">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1171808292?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="Karsten Warholm — WR 400m Hurdles"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Athletics</div>
+            <div class="video-card-title">Karsten Warholm — WR 400m Hurdles</div>
+          </div>
+        </div>
+
+        <!-- Card 3 — Toyota Commercial -->
+        <div class="video-card" data-title="Toyota — Tony Nyhaug" data-label="Commercial" data-vimeo="350741185">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/350741185?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="Toyota — Tony Nyhaug"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Commercial</div>
+            <div class="video-card-title">Toyota — Tony Nyhaug</div>
+          </div>
+        </div>
+
+        <!-- Card 4 — FIBA 3x3 World Cup -->
+        <div class="video-card" data-title="FIBA 3x3 World Cup 2019" data-label="Sports Promo" data-vimeo="1171806909">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1171806909?background=1&autoplay=1&muted=1&loop=1"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Sports Promo</div>
+            <div class="video-card-title">FIBA 3x3 World Cup 2019</div>
+          </div>
+        </div>
+
+        <!-- Card 5 — Euro Qualifiers -->
+        <div class="video-card" data-title="Men's Euro Qualifiers 2026" data-label="Sports Promo" data-vimeo="925215140">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/925215140?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="Men's Euro Qualifiers 2026"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Sports Promo</div>
+            <div class="video-card-title">Men's Euro Qualifiers 2026</div>
+          </div>
+        </div>
+
+        <!-- Card 6 — PGA -->
+        <div class="video-card" data-title="PGA Tour Feature" data-label="Sports" data-vimeo="1171805638">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1171805638?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="PGA Tour Feature"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Sports</div>
+            <div class="video-card-title">PGA Tour Feature</div>
+          </div>
+        </div>
+
+        <!-- Card 7 — 2025 Edit Reel -->
+        <div class="video-card" data-title="2025 Edit Reel" data-label="Edit Reel" data-vimeo="1071723790">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1071723790?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="2025 Edit Reel"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Edit Reel</div>
+            <div class="video-card-title">2025 Edit Reel</div>
+          </div>
+        </div>
+
+        <!-- Card 8 — AI Edit Reel 2026 -->
+        <div class="video-card" data-title="AI Edit Reel 2026" data-label="AI Portfolio" data-vimeo="1166664707">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1166664707?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="AI Edit Reel 2026"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">AI Portfolio</div>
+            <div class="video-card-title">AI Edit Reel 2026</div>
+          </div>
+        </div>
+
+        <!-- Card 9 — Shredding Monsters -->
+        <div class="video-card" data-title="Shredding Monsters" data-label="Action Sports" data-vimeo="1171810803">
+          <iframe class="video-thumb" src="https://player.vimeo.com/video/1171810803?background=1&autoplay=1&muted=1&loop=1"
+            frameborder="0" allow="autoplay; fullscreen"
+            style="position:absolute;inset:0;width:100%;height:100%;border:0;" title="Shredding Monsters"></iframe>
+          <div class="video-overlay"></div>
+          <div class="video-card-content">
+            <div class="video-card-label">Action Sports</div>
+            <div class="video-card-title">Shredding Monsters</div>
+          </div>
+        </div>
+
+      </div><!-- /card-strip -->
+    </div><!-- /card-strip-wrapper -->
+  </div>
+
+  <!-- Bottom fade-out -->
+  <div class="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+    style="background: linear-gradient(to bottom, transparent, #060d18);"></div>
+</section>
+
+
+<!-- ══════════════════════ SERVICES ══════════════════════ -->
+<section id="services" class="relative py-24 px-6 overflow-hidden pink-section-bg">
+  <div class="absolute inset-0 glow-section pointer-events-none"></div>
+  <div class="max-w-5xl mx-auto relative z-10">
+
+    <div class="text-center mb-16">
+      <span class="section-label mb-3 block">What I Do</span>
+      <h2 class="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4"
+        style="letter-spacing:-.025em;">
+        Three Disciplines.<br/>One Creative Vision.
+      </h2>
+      <p class="text-sm max-w-md mx-auto" style="color:#4e6280; line-height:1.75;">
+        Sports editing. AI filmmaking. AI image &amp; video training. Three specialisms —
+        the same obsessive attention to craft on every project.
+      </p>
+    </div>
+
+    <!-- Three service cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+      <!-- Sports Video Editing -->
+      <div class="card-bg card-glow rounded-2xl p-8 relative overflow-hidden">
+
+        <div class="service-icon mb-6">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
+            <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff7338"/><stop offset="100%" stop-color="#ff2d78"/>
+            </linearGradient></defs>
+            <path stroke="url(#g1)" d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-xl mb-3">Sports Video Editing</h3>
+        <!-- Emmy credential badge -->
+        <div class="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full" style="background:rgba(255,202,40,0.08); border:1px solid rgba(255,202,40,0.25);">
+          <img src="images/Sports Emmy Trophy.png" alt="Emmy" style="height:20px; width:auto; filter:drop-shadow(0 0 4px #ffca28aa);">
+          <span class="text-xs font-semibold tracking-wide" style="color:#ffca28;">Sports Emmy Winner</span>
+        </div>
+        <p class="text-sm leading-relaxed mb-6" style="color:#4e6280;">
+          Multiple Sports Emmy wins and nominations. 20+ years cutting elite content for international brands and broadcasters.
+          Every frame timed to the energy of the moment — from live-action highlights to full productions.
+        </p>
+        <ul class="space-y-2 mb-7">
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Sports Highlights &amp; Reels</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Broadcast &amp; Network Delivery</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Brand &amp; Sponsorship Films</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Social Media Cuts &amp; Reels</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Color Grading &amp; Motion Graphics</li>
+        </ul>
+        <a href="#contact" class="btn-primary px-5 py-2.5 rounded-lg text-sm font-semibold">Get a Quote</a>
+      </div>
+
+      <!-- AI Filmmaking -->
+      <div class="card-bg card-glow rounded-2xl p-8">
+        <div class="service-icon mb-6">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
+            <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff7338"/><stop offset="100%" stop-color="#ff2d78"/>
+            </linearGradient></defs>
+            <path stroke="url(#g2)" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-xl mb-3">AI Filmmaking</h3>
+        <p class="text-sm leading-relaxed mb-6" style="color:#4e6280;">
+          Directing and producing AI-generated cinematic content — from concept to final cut.
+          Prompt-to-frame generation, AI compositing, and hybrid live-action/AI pipelines.
+        </p>
+        <ul class="space-y-2 mb-7">
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff2d78;">→</span> AI-Generated Footage &amp; Scenes</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff2d78;">→</span> Cinematic Prompt Direction</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff2d78;">→</span> Hybrid AI / Live-Action Edits</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff2d78;">→</span> Sora, Runway, Kling &amp; Veo Workflows</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff2d78;">→</span> AI Music &amp; Sound Design</li>
+        </ul>
+        <a href="#contact" class="btn-primary px-5 py-2.5 rounded-lg text-sm font-semibold">Work With Me</a>
+      </div>
+
+      <!-- AI Training -->
+      <div class="card-bg card-glow rounded-2xl p-8">
+        <div class="service-icon mb-6">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
+            <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ff7338"/><stop offset="100%" stop-color="#ff2d78"/>
+            </linearGradient></defs>
+            <path stroke="url(#g3)" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-xl mb-3">AI Image &amp; Video Training</h3>
+        <p class="text-sm leading-relaxed mb-6" style="color:#4e6280;">
+          Expert annotator and AI tutor for leading platforms — helping models see, understand,
+          and generate visual content with cinematic precision and contextual accuracy.
+        </p>
+        <ul class="space-y-2 mb-7">
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Image &amp; Video Annotation (RLHF)</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> AI Model Feedback &amp; Ranking</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Training Data Quality Assurance</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Visual Prompt Evaluation</li>
+          <li class="flex items-center gap-2 text-sm" style="color:#8fa3c0;"><span style="color:#ff7338;">→</span> Dataset Curation &amp; Labeling</li>
+        </ul>
+        <a href="#contact" class="btn-primary px-5 py-2.5 rounded-lg text-sm font-semibold">Work With Me</a>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="card-bg rounded-xl p-5 text-center">
+        <div class="stat-number">20+</div>
+        <div class="text-xs mt-1" style="color:#3a5070;">Years Editing</div>
+      </div>
+      <div class="card-bg rounded-xl p-5 text-center">
+        <div class="stat-number">500+</div>
+        <div class="text-xs mt-1" style="color:#3a5070;">Videos Delivered</div>
+      </div>
+      <div class="card-bg rounded-xl p-5 text-center">
+        <div class="stat-number">50K+</div>
+        <div class="text-xs mt-1" style="color:#3a5070;">AI Assets Annotated</div>
+      </div>
+      <div class="card-bg rounded-xl p-5 text-center">
+        <div class="stat-number">100%</div>
+        <div class="text-xs mt-1" style="color:#3a5070;">Client Satisfaction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ AI FILMMAKING REEL ══════════════════════ -->
+<section id="ai-reel" class="relative py-24 px-6 overflow-hidden"
+  style="background: linear-gradient(180deg, #060d18 0%, #08101e 50%, #060d18 100%); border-top:1px solid #0f1e30;">
+  <div class="absolute inset-0 pointer-events-none"
+    style="background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,45,120,.1) 0%, rgba(255,115,56,.05) 50%, transparent 70%);"></div>
+  <div class="max-w-5xl mx-auto relative z-10">
+
+    <div class="text-center mb-12">
+      <span class="section-label mb-3 block">AI Filmmaking</span>
+      <h2 class="text-4xl font-extrabold text-white mb-4" style="letter-spacing:-.02em;">
+        Where AI Meets <span class="gradient-text">Cinema</span>
+      </h2>
+      <p class="text-sm max-w-lg mx-auto" style="color:#4e6280; line-height:1.75;">
+        Blending 20+ years of editorial craft with cutting-edge AI tools — generating, directing, and
+        refining visual stories that wouldn't be possible any other way.
+      </p>
+    </div>
+
+    <!-- Featured video player -->
+    <div class="relative rounded-2xl overflow-hidden mb-10"
+      style="border:1px solid #1a2d47; box-shadow:0 0 80px rgba(255,45,120,.1), 0 24px 60px rgba(0,0,0,.5);">
+      <div style="padding:56.25% 0 0 0; position:relative;">
+        <iframe
+          src="https://player.vimeo.com/video/1166664707?badge=0&autopause=0&player_id=0&app_id=58479"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+          title="AI Edit Reel 2026">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- Three feature callouts below the video -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card-bg rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff7338" stroke-width="1.8">
+            <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">AI-Generated Footage</h4>
+        <p class="text-xs" style="color:#4e6280;">Prompt-to-frame generation integrated seamlessly into live-action timelines.</p>
+      </div>
+      <div class="card-bg rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff2d78" stroke-width="1.8">
+            <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">Cinematic AI Direction</h4>
+        <p class="text-xs" style="color:#4e6280;">Directing AI video models with precision prompts — shaping tone, motion, and cinematic language.</p>
+      </div>
+      <div class="card-bg rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff7338" stroke-width="1.8">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">Hybrid Workflows</h4>
+        <p class="text-xs" style="color:#4e6280;">Combining Premiere Pro, DaVinci, and AI pipelines into one cohesive output.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════ PORTFOLIO / TOOLS ══════════════════════ -->
+<section id="portfolio" class="relative py-24 px-6 overflow-hidden" style="border-top:1px solid #0f1e30;">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="text-center mb-12">
+      <span class="section-label mb-3 block">Portfolio &amp; Tools</span>
+      <h2 class="text-4xl font-extrabold text-white mb-4" style="letter-spacing:-.02em;">
+        Built for Visual Storytelling
+      </h2>
+      <p class="text-sm max-w-md mx-auto" style="color:#4e6280; line-height:1.75;">
+        Proficient in the industry's leading tools, delivering professional-grade output on every project.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+      <div class="card-bg card-glow rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff7338" stroke-width="1.8">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">Adobe Premiere Pro</h4>
+        <p class="text-xs mb-3" style="color:#4e6280;">Primary suite for long-form and commercial editing.</p>
+        <div class="skill-bar"><div class="skill-bar-fill" style="width:95%;"></div></div>
+      </div>
+
+      <div class="card-bg card-glow rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff2d78" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">DaVinci Resolve</h4>
+        <p class="text-xs mb-3" style="color:#4e6280;">Color grading, audio mastering &amp; advanced editing.</p>
+        <div class="skill-bar"><div class="skill-bar-fill" style="width:90%;"></div></div>
+      </div>
+
+      <div class="card-bg card-glow rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff7338" stroke-width="1.8">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">Adobe After Effects</h4>
+        <p class="text-xs mb-3" style="color:#4e6280;">Motion graphics, VFX &amp; animated title sequences.</p>
+        <div class="skill-bar"><div class="skill-bar-fill" style="width:85%;"></div></div>
+      </div>
+
+      <div class="card-bg card-glow rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff2d78" stroke-width="1.8">
+            <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">AI Annotation Platforms</h4>
+        <p class="text-xs mb-3" style="color:#4e6280;">Scale AI, Appen, Labelbox &amp; proprietary tooling.</p>
+        <div class="skill-bar"><div class="skill-bar-fill" style="width:92%;"></div></div>
+      </div>
+
+      <div class="card-bg card-glow rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff7338" stroke-width="1.8">
+            <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">4K/8K Delivery Workflows</h4>
+        <p class="text-xs mb-3" style="color:#4e6280;">ProRes, H.264/265, proxy workflows &amp; cloud delivery.</p>
+        <div class="skill-bar"><div class="skill-bar-fill" style="width:88%;"></div></div>
+      </div>
+
+      <div class="card-bg card-glow rounded-xl p-5">
+        <div class="feature-icon mb-3">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ff2d78" stroke-width="1.8">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h4 class="text-white text-sm font-semibold mb-1">RLHF &amp; Model Evaluation</h4>
+        <p class="text-xs mb-3" style="color:#4e6280;">Expert feedback, tutor certification &amp; quality review.</p>
+        <div class="skill-bar"><div class="skill-bar-fill" style="width:96%;"></div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ AI TOOLS ══════════════════════ -->
+<section id="tools" class="relative py-24 px-6 overflow-hidden" style="border-top:1px solid #0f1e30;">
+  <div class="absolute inset-0 pointer-events-none"
+    style="background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,115,56,.07) 0%, rgba(255,45,120,.05) 40%, transparent 70%);"></div>
+  <div class="max-w-5xl mx-auto relative z-10">
+
+    <div class="text-center mb-12">
+      <span class="section-label mb-3 block">AI Tools</span>
+      <h2 class="text-4xl font-extrabold text-white mb-4" style="letter-spacing:-.02em;">
+        Built-In Prompt Tools
+      </h2>
+      <p class="text-sm max-w-md mx-auto" style="color:#4e6280; line-height:1.75;">
+        Free browser-based tools for crafting AI image and video prompts — no account, no API key required.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="tools-grid">
+
+      <!-- CinePrompt -->
+      <div class="card-bg card-glow rounded-2xl overflow-hidden" style="border-color:#1a2d47;">
+        <!-- Top accent bar -->
+        <div style="height:3px;background:linear-gradient(90deg,#ff7338,#ff2d78);"></div>
+        <div class="p-7 flex flex-col gap-5 h-full">
+          <!-- Header -->
+          <div class="flex items-start gap-4">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(255,115,56,.15),rgba(255,45,120,.12));border:1px solid rgba(255,45,120,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#ff7338">
+                <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-white font-bold" style="font-size:1.1rem;">CinePrompt</h3>
+                <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(255,115,56,.12);color:#ff7338;border:1px solid rgba(255,115,56,.28);">VIDEO &amp; IMAGE</span>
+              </div>
+              <p class="text-xs" style="color:#6e8aaa;">Cinematic AI Prompt Builder</p>
+            </div>
+          </div>
+          <!-- Description -->
+          <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
+            Build professional cinematic prompts for <strong style="color:#6e8aaa;">Kling 3.0</strong>,
+            <strong style="color:#6e8aaa;">Runway Gen-4</strong>,
+            <strong style="color:#6e8aaa;">Nano Banana 2</strong> and
+            <strong style="color:#6e8aaa;">Midjourney V7</strong> —
+            with step-by-step controls for camera body, lens, aperture, shot type, camera movement,
+            lighting, color grade, film stock and texture.
+          </p>
+          <!-- Feature chips -->
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-tag">8 Platforms</span>
+            <span class="skill-tag">Camera Controls</span>
+            <span class="skill-tag">Lighting</span>
+            <span class="skill-tag">Color Grade</span>
+            <span class="skill-tag">Film Texture</span>
+          </div>
+          <!-- CTA -->
+          <a href="cineprompt/index.html"
+            class="btn-primary px-6 py-3 rounded-xl font-semibold text-sm mt-auto"
+            style="text-align:center;display:block;letter-spacing:.02em;">
+            Launch CinePrompt →
+          </a>
+        </div>
+      </div>
+
+      <!-- JSON Prompt Builder -->
+      <div class="card-bg card-glow rounded-2xl overflow-hidden" style="border-color:#1a2d47;">
+        <!-- Top accent bar -->
+        <div style="height:3px;background:linear-gradient(90deg,#ffca28,#ff7338);"></div>
+        <div class="p-7 flex flex-col gap-5 h-full">
+          <!-- Header -->
+          <div class="flex items-start gap-4">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(255,202,40,.12),rgba(255,115,56,.1));border:1px solid rgba(255,202,40,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffca28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-white font-bold" style="font-size:1.1rem;">JSON Prompt Builder</h3>
+                <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(255,202,40,.1);color:#ffca28;border:1px solid rgba(255,202,40,.28);">NB2</span>
+              </div>
+              <p class="text-xs" style="color:#6e8aaa;">NanoBanana 2 · Structured JSON</p>
+            </div>
+          </div>
+          <!-- Description -->
+          <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
+            Type a natural language description and get a fully structured
+            <strong style="color:#6e8aaa;">JSON prompt</strong> for
+            <strong style="color:#6e8aaa;">NanoBanana 2</strong> (Gemini 3.1 Flash Image) instantly —
+            with automatic detection of subject, style, lighting and scene, plus manual overrides
+            for every camera, composition and quality parameter.
+          </p>
+          <!-- Feature chips -->
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-tag">Auto-detect</span>
+            <span class="skill-tag">7 Control Sections</span>
+            <span class="skill-tag">Materials</span>
+            <span class="skill-tag">Character ID</span>
+            <span class="skill-tag">Live Output</span>
+          </div>
+          <!-- CTA -->
+          <a href="json-prompt/index.html"
+            class="px-6 py-3 rounded-xl font-semibold text-sm mt-auto"
+            style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(255,202,40,.14),rgba(255,115,56,.1));border:1px solid rgba(255,202,40,.35);color:#ffca28;transition:opacity .2s;"
+            onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            Launch JSON Builder →
+          </a>
+        </div>
+      </div>
+
+      <!-- SRT Maker — spans full width as a desktop download tool -->
+      <div class="card-bg card-glow rounded-2xl overflow-hidden md:col-span-2" style="border-color:#1a2d47;">
+        <!-- Top accent bar -->
+        <div style="height:3px;background:linear-gradient(90deg,#38d9d9,#5b8dee);"></div>
+        <div class="p-7 flex flex-col md:flex-row gap-8">
+          <!-- Left: header + description -->
+          <div class="flex flex-col gap-5 flex-1">
+            <div class="flex items-start gap-4">
+              <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.1));border:1px solid rgba(56,217,217,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="M7 9h10M7 12h6M7 15h8"/>
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <h3 class="text-white font-bold" style="font-size:1.1rem;">SRT Maker</h3>
+                  <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(56,217,217,.1);color:#38d9d9;border:1px solid rgba(56,217,217,.28);">DESKTOP APP</span>
+                </div>
+                <p class="text-xs" style="color:#6e8aaa;">AI Subtitle &amp; Transcription · Windows &amp; Mac</p>
+              </div>
+            </div>
+            <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
+              Drop any audio or video file and get a properly formatted
+              <strong style="color:#6e8aaa;">.srt subtitle file</strong> in seconds —
+              powered by <strong style="color:#6e8aaa;">OpenAI Whisper</strong> running entirely on your machine.
+              Supports <strong style="color:#6e8aaa;">Italian, German, French and English</strong> with
+              automatic language detection. No internet required after first model download.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-tag">Fully Offline</span>
+              <span class="skill-tag">Whisper AI</span>
+              <span class="skill-tag">Drag &amp; Drop</span>
+              <span class="skill-tag">4 Languages</span>
+              <span class="skill-tag">Batch Queue</span>
+              <span class="skill-tag">Fast / Balanced / Best</span>
+            </div>
+          </div>
+          <!-- Right: CTA -->
+          <div class="flex flex-col gap-3 justify-center md:min-w-[200px]">
+            <a href="srt-maker/index.html"
+              class="px-6 py-3 rounded-xl font-semibold text-sm"
+              style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(56,217,217,.14),rgba(91,141,238,.1));border:1px solid rgba(56,217,217,.35);color:#38d9d9;transition:opacity .2s;"
+              onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+              Learn More &amp; Download →
+            </a>
+            <p class="text-xs text-center" style="color:#4e6280;">Windows 10/11 · macOS Apple Silicon</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ ABOUT ══════════════════════ -->
+<section id="about" class="relative py-24 px-6 overflow-hidden pink-section-bg">
+  <div class="absolute inset-0 pointer-events-none"
+    style="background: radial-gradient(ellipse 65% 60% at 65% 50%, rgba(255,45,120,.1) 0%, transparent 70%);"></div>
+  <div class="max-w-5xl mx-auto relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+
+      <!-- Headshot -->
+      <div class="flex justify-center md:justify-end order-1">
+        <div class="headshot-frame headshot-glitch" style="width:300px;">
+          <img src="images/Marc Image NEW.png" alt="Marc Warfield"
+            style="width:300px; display:block; object-fit:cover;" />
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="order-2">
+        <span class="section-label mb-3 block">About Marc</span>
+        <h2 class="text-4xl font-extrabold text-white mb-6 leading-tight" style="letter-spacing:-.025em;">
+          The Editor.<br/>The Filmmaker.<br/>The AI Expert.
+        </h2>
+        <p class="text-sm leading-relaxed mb-4" style="color:#4e6280; line-height:1.85;">
+          I'm Marc Warfield, founder of DynamicVibe Productions. With 20+ years editing elite sports for
+          international brands and broadcasters, I've built a career on cinematic storytelling under pressure —
+          from live broadcast to high-end commercial productions.
+        </p>
+        <p class="text-sm leading-relaxed mb-8" style="color:#4e6280; line-height:1.85;">
+          Now I'm pushing the craft further with AI filmmaking and expert visual AI training. As an AI image
+          and video annotator/tutor for leading platforms, I bring a professional filmmaker's eye to the
+          task of teaching machines how to see — and a technologist's edge to every edit I make.
+        </p>
+
+        <div class="flex flex-wrap gap-2 mb-8">
+          <span class="skill-tag">Sports Editing</span>
+          <span class="skill-tag">Color Grading</span>
+          <span class="skill-tag">Motion Graphics</span>
+          <span class="skill-tag">AI Filmmaking</span>
+          <span class="skill-tag">AI Annotation</span>
+          <span class="skill-tag">RLHF</span>
+          <span class="skill-tag">Prompt Engineering</span>
+          <span class="skill-tag">Visual Storytelling</span>
+          <span class="skill-tag">Adobe Suite</span>
+          <span class="skill-tag">DaVinci Resolve</span>
+        </div>
+
+        <div class="flex gap-3 flex-wrap">
+          <a href="Resume/Marc_Warfield_CV_AI_2026-27.pdf" download
+            class="btn-primary px-5 py-2.5 rounded-lg text-sm font-semibold">Download CV</a>
+          <a href="#contact" class="btn-secondary px-5 py-2.5 rounded-lg text-sm font-medium">Let's Talk</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ LEARNING ══════════════════════ -->
+<section id="learning" class="relative py-24 px-6 overflow-hidden pink-section-bg" style="border-top:1px solid #0f1e30;">
+  <div class="max-w-4xl mx-auto text-center relative z-10">
+    <span class="section-label mb-3 block">AI Learning Hub</span>
+    <h2 class="font-extrabold text-white mb-5 leading-tight"
+      style="font-size:2.6rem; letter-spacing:-.025em; line-height:1.1;">
+      Learn with <span class="gradient-text">NotebookLM</span>
+    </h2>
+    <p class="text-dvp-muted mb-10 max-w-xl mx-auto" style="font-size:1.05rem; line-height:1.7;">
+      Explore AI-powered study tools, interactive notebooks, and curated learning resources — all in one place.
+    </p>
+    <a href="https://python-ai-builders-yadqhmkaqxmfqgfhi5ra2a.streamlit.app/" target="_blank" rel="noopener noreferrer"
+      class="btn-primary px-8 py-4 rounded-full font-bold text-base inline-flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      Open Learning Hub
+    </a>
+    <p class="mt-4 text-xs" style="color:#2e4560;">Launches the interactive AI notebook app in a new tab</p>
+  </div>
+</section>
+
+<!-- ══════════════════════ CONTACT ══════════════════════ -->
+<section id="contact" class="relative py-24 px-6 overflow-hidden"
+  style="background: linear-gradient(180deg, #060d18 0%, #090e20 50%, #060d18 100%);">
+  <div class="absolute inset-0 pointer-events-none"
+    style="background: radial-gradient(ellipse 70% 60% at 50% 65%, rgba(255,45,120,.14) 0%, transparent 70%);"></div>
+  <div class="max-w-2xl mx-auto text-center relative z-10">
+    <span class="section-label mb-3 block">Get In Touch</span>
+    <h2 class="font-extrabold text-white mb-4 leading-tight"
+      style="font-size:2.9rem; letter-spacing:-.025em; line-height:1.1;">
+      Ready to create<br/>something <span class="gradient-text">dynamic?</span>
+    </h2>
+    <p class="text-sm leading-relaxed mb-10 max-w-sm mx-auto" style="color:#4e6280; line-height:1.75;">
+      Whether you need video editing, AI annotation services, or want to collaborate — I'd love to connect.
+    </p>
+
+    <div class="card-bg rounded-2xl p-8 text-left">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-xs mb-1.5 block" style="color:#4e6280;">Your Name</label>
+          <input type="text" placeholder="Jane Smith"
+            class="w-full rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none"
+            style="background:#0a1322; border:1px solid #1a2d47;" />
+        </div>
+        <div>
+          <label class="text-xs mb-1.5 block" style="color:#4e6280;">Email Address</label>
+          <input type="email" placeholder="jane@company.com"
+            class="w-full rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none"
+            style="background:#0a1322; border:1px solid #1a2d47;" />
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="text-xs mb-1.5 block" style="color:#4e6280;">Service Needed</label>
+        <select class="w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none"
+          style="background:#0a1322; border:1px solid #1a2d47; color:#8fa3c0;">
+          <option value="">Select a service…</option>
+          <option>Video Editing</option>
+          <option>AI Annotation / Training</option>
+          <option>Both Services</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="mb-6">
+        <label class="text-xs mb-1.5 block" style="color:#4e6280;">Tell me about your project</label>
+        <textarea rows="4" placeholder="Describe your project, timeline, and budget…"
+          class="w-full rounded-lg px-3 py-2.5 text-sm text-white resize-none focus:outline-none"
+          style="background:#0a1322; border:1px solid #1a2d47;"></textarea>
+      </div>
+      <button class="w-full btn-primary py-3 rounded-lg text-sm font-semibold">
+        Send Message →
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer class="px-6 py-12" style="border-top:1px solid #0f1e30;">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex flex-col md:flex-row items-start justify-between gap-10 mb-10">
+
+      <!-- Brand -->
+      <div class="max-w-xs">
+        <div class="flex items-center gap-3 mb-4">
+          <img src="images/DVP_LOGO UseMe.jpg" alt="DVP"
+            style="width:32px; height:32px; border-radius:8px; object-fit:cover;" />
+          <span class="font-bold text-white text-sm">DynamicVibe Productions</span>
+        </div>
+        <p class="text-xs leading-relaxed mb-4" style="color:#2e4560;">
+          Professional video editing and AI training services. Crafting stories that move — training machines that see.
+        </p>
+        <div class="flex gap-3">
+          <a href="https://www.linkedin.com/in/marc-warfield-5698a124/" target="_blank" rel="noopener" class="text-xs px-3 py-1 rounded-full" style="border:1px solid #1a2d47; color:#4e6280;">LinkedIn</a>
+          <a href="https://vimeo.com/user2838211" target="_blank" rel="noopener" class="text-xs px-3 py-1 rounded-full" style="border:1px solid #1a2d47; color:#4e6280;">Vimeo</a>
+          <a href="https://www.instagram.com/what_marc_eats/" target="_blank" rel="noopener" class="text-xs px-3 py-1 rounded-full" style="border:1px solid #1a2d47; color:#4e6280;">Instagram</a>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="flex gap-12">
+        <div>
+          <h5 class="text-white text-xs font-semibold mb-3 uppercase tracking-wider">Services</h5>
+          <ul class="space-y-2">
+            <li><a href="#services" class="text-xs" style="color:#2e4560;">Video Editing</a></li>
+            <li><a href="#ai-reel"  class="text-xs" style="color:#2e4560;">AI Filmmaking</a></li>
+            <li><a href="#services" class="text-xs" style="color:#2e4560;">AI Training</a></li>
+            <li><a href="#services" class="text-xs" style="color:#2e4560;">Motion Graphics</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-white text-xs font-semibold mb-3 uppercase tracking-wider">Resources</h5>
+          <ul class="space-y-2">
+            <li><a href="Resume/Marc_Warfield_CV_AI_2026-27.pdf" download class="text-xs" style="color:#2e4560;">Download CV</a></li>
+            <li><a href="#portfolio" class="text-xs" style="color:#2e4560;">Portfolio</a></li>
+            <li><a href="#about"    class="text-xs" style="color:#2e4560;">About</a></li>
+            <li><a href="#contact"  class="text-xs" style="color:#2e4560;">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6"
+      style="border-top:1px solid #0f1e30;">
+      <p class="text-xs" style="color:#1e3050;">© 2026 DynamicVibe Productions · Marc Warfield · All rights reserved.</p>
+      <p class="text-xs" style="color:#1e3050;">Video Editor &amp; AI Training Specialist</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════ VIDEO POPUP WINDOW ══════════════════════ -->
+<div id="videoWin"
+  style="display:none; flex-direction:column; position:fixed; z-index:9999;
+         top:50%; left:50%; transform:translate(-50%,-50%);
+         width:640px; height:400px; min-width:300px; min-height:200px;
+         background:#0d1929; border:1px solid #1a2d47; border-radius:14px;
+         box-shadow:0 24px 80px rgba(0,0,0,.9), 0 0 50px rgba(255,45,120,.12);
+         overflow:hidden; resize:both;">
+
+  <!-- Title / drag bar -->
+  <div id="videoWinBar"
+    style="background:#070e1a; border-bottom:1px solid #1a2d47; padding:9px 14px;
+           display:flex; align-items:center; justify-content:space-between;
+           cursor:move; user-select:none; flex-shrink:0; height:42px;">
+    <div style="display:flex; align-items:center; overflow:hidden; gap:0;">
+      <span style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#ff7338,#ff2d78);flex-shrink:0;margin-right:8px;display:inline-block;"></span>
+      <span id="videoWinLabel" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#ff7338;flex-shrink:0;margin-right:8px;"></span>
+      <span id="videoWinTitle" style="font-size:12px;font-weight:600;color:#dde8f8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
+    </div>
+    <button onclick="closeVideoWin()"
+      style="width:22px;height:22px;border-radius:50%;background:rgba(255,45,120,.15);border:1px solid rgba(255,45,120,.3);color:#ff7aa5;font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:12px;">×</button>
+  </div>
+
+  <!-- Video player fills remaining height -->
+  <video id="videoWinPlayer" controls
+    style="flex:1;min-height:0;width:100%;height:calc(100% - 42px);display:block;background:#000;"></video>
+  <iframe id="videoWinIframe" frameborder="0" allow="autoplay; fullscreen"
+    style="display:none;flex:1;min-height:0;width:100%;height:calc(100% - 42px);border:0;background:#000;"></iframe>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     CARD STRIP — left-to-right scroll + scramble
+     Cards enter from the left, encrypt as they
+     cross the line at 70% (30% from right).
+════════════════════════════════════════════ -->
+<script>
+(function () {
+
+  /* ══════════════════════════════════════════
+     ENCRYPT JUMBLE — per-card canvas overlay
+     Dense grid of rapidly changing chars that
+     fills the card as it crosses the line.
+  ══════════════════════════════════════════ */
+  const matrixData = new WeakMap();
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*<>[]{}|/\\~`=+-';
+  const FS = 10; // grid cell size in px
+
+  function ensureMatrix(card) {
+    if (!matrixData.has(card)) {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:6;border-radius:13px;';
+      card.appendChild(canvas);
+      canvas.width  = 290;
+      canvas.height = 180;
+      const ctx = canvas.getContext('2d');
+      matrixData.set(card, { canvas, ctx, lastP: 0 });
+    }
+    return matrixData.get(card);
+  }
+
+  function tickMatrix(card, p) {
+    const d = ensureMatrix(card);
+    const { canvas, ctx } = d;
+    const W = 290, H = 180;
+
+    if (p < 0.005) {
+      if (d.lastP >= 0.005) ctx.clearRect(0, 0, W, H);
+      d.lastP = p;
+      return;
+    }
+    d.lastP = p;
+
+    // The encrypted region is the portion of the card that has crossed the line.
+    // p=0 → none encrypted; p=1 → fully encrypted.
+    // As the card scrolls right-to-left through the line, the right edge crosses first,
+    // so the encrypted strip starts at the right and grows leftward.
+    const encX = Math.round(W * (1 - p)); // left edge of encrypted strip in card coords
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+
+    // Clip all drawing to [encX … W] — only the crossed portion
+    ctx.beginPath();
+    ctx.rect(encX, 0, W - encX, H);
+    ctx.clip();
+
+    // Dark backing so characters are readable over the video
+    ctx.fillStyle = 'rgba(8,4,16,0.88)';
+    ctx.fillRect(encX, 0, W - encX, H);
+
+    ctx.font = `bold ${FS}px monospace`;
+    const startCol = Math.floor(encX / FS);
+    const cols = Math.ceil(W / FS);
+    const rows = Math.ceil(H / FS);
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = startCol; c < cols; c++) {
+        if (Math.random() > 0.82) continue; // sparse gaps for texture
+
+        const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+        const x  = c * FS;
+        const y  = (r + 1) * FS;
+
+        const roll = Math.random();
+        if (roll > 0.88) {
+          ctx.fillStyle = 'rgba(255,220,235,0.95)'; // near-white flash
+        } else if (roll > 0.52) {
+          ctx.fillStyle = 'rgba(255,115,56,0.85)';  // coral
+        } else {
+          ctx.fillStyle = 'rgba(255,45,120,0.78)';  // hot pink
+        }
+        ctx.fillText(ch, x, y);
+      }
+    }
+
+    ctx.restore();
+  }
+
+
+  /* ══════════════════════════════════════════
+     CARD STRIP — seamless left-to-right scroll
+  ══════════════════════════════════════════ */
+  const strip = document.getElementById('cardStrip');
+  if (!strip) return;
+
+  const origCards = Array.from(strip.children);
+
+  // Prepend clones: strip = [clones][originals]
+  const frag = document.createDocumentFragment();
+  origCards.forEach(c => {
+    const clone = c.cloneNode(true);
+    clone.querySelectorAll('video').forEach(v => {
+      v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true;
+    });
+    frag.appendChild(clone);
+  });
+  strip.insertBefore(frag, strip.firstChild);
+
+  const CARD_W  = 290 + 14;
+  const TOTAL_W = origCards.length * CARD_W;
+  const SPEED   = 0.55;
+
+  let offset = TOTAL_W;
+  let paused = false;
+
+  function initCards() {
+    Array.from(strip.children).forEach(card => {
+      const titleEl = card.querySelector('.video-card-title');
+      const labelEl = card.querySelector('.video-card-label');
+      if (!card.dataset.title && titleEl) card.dataset.title = titleEl.textContent.trim();
+      if (!card.dataset.label && labelEl) card.dataset.label = labelEl.textContent.trim();
+      ensureMatrix(card); // pre-create canvases
+    });
+  }
+
+  // Cached line position — synced from the actual CSS .scramble-line element
+  let cachedLineX = window.innerWidth * 0.70;
+
+  function scrambleProgress(rect) {
+    if (rect.right <= cachedLineX) return 0;
+    if (rect.left  >= cachedLineX) return 1;
+    return (rect.right - cachedLineX) / rect.width;
+  }
+
+  function tick() {
+    if (!paused) {
+      offset -= SPEED;
+      if (offset <= 0) offset += TOTAL_W;
+    }
+    strip.style.transform = `translateX(${-offset}px)`;
+
+    Array.from(strip.children).forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const p    = scrambleProgress(rect);
+
+      if (p > 0.02) {
+        card.classList.add('scrambled');
+      } else {
+        card.classList.remove('scrambled');
+      }
+
+      tickMatrix(card, p);
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  // Pause on hover
+  const wrapper = strip.closest('.card-strip-wrapper');
+  if (wrapper) {
+    wrapper.addEventListener('mouseenter', () => { paused = true; });
+    wrapper.addEventListener('mouseleave', () => { paused = false; });
+
+    // Sync cachedLineX to the exact pixel position of the CSS .scramble-line element
+    // so the JS encryption boundary matches the visual line precisely.
+    const scrambleLineEl = wrapper.querySelector('.scramble-line');
+    function updateLineX() {
+      if (scrambleLineEl) cachedLineX = scrambleLineEl.getBoundingClientRect().left;
+    }
+    updateLineX();
+    window.addEventListener('resize', updateLineX);
+  }
+
+  setTimeout(() => {
+    strip.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
+  }, 300);
+
+  initCards();
+  requestAnimationFrame(tick);
+
+
+  /* ══════════════════════════════════════════
+     CLICK → open floating video window
+     Only fires on non-scrambled cards
+  ══════════════════════════════════════════ */
+  strip.addEventListener('click', e => {
+    const card = e.target.closest('.video-card');
+    if (!card || card.classList.contains('scrambled')) return;
+
+    const title     = card.dataset.title || '';
+    const label     = card.dataset.label || '';
+    const vimeoId   = card.dataset.vimeo;
+    const youtubeId = card.dataset.youtube;
+
+    if (vimeoId) {
+      openVimeoWin(vimeoId, title, label);
+    } else if (youtubeId) {
+      openVimeoWin(`https://www.youtube.com/embed/${youtubeId}?autoplay=1`, title, label, true);
+    } else {
+      // Resolve the video src (handle both <source> and direct src)
+      const vidEl = card.querySelector('video');
+      const srcEl = vidEl && vidEl.querySelector('source');
+      const src   = (srcEl ? srcEl.getAttribute('src') : vidEl && vidEl.getAttribute('src')) || '';
+      openVideoWin(src, title, label);
+    }
+  });
+
+
+  /* ══════════════════════════════════════════
+     FLOATING VIDEO WINDOW
+  ══════════════════════════════════════════ */
+  const win      = document.getElementById('videoWin');
+  const player   = document.getElementById('videoWinPlayer');
+  const winTitle = document.getElementById('videoWinTitle');
+  const winLabel = document.getElementById('videoWinLabel');
+  const winBar   = document.getElementById('videoWinBar');
+
+  const winIframe = document.getElementById('videoWinIframe');
+
+  function resetWinPosition() {
+    win.style.left      = '50%';
+    win.style.top       = '50%';
+    win.style.transform = 'translate(-50%,-50%)';
+  }
+
+  window.openVideoWin = function(src, title, label) {
+    winIframe.style.display = 'none';
+    winIframe.src = '';
+    player.style.display = 'block';
+    player.src = src;
+    winTitle.textContent = title;
+    winLabel.textContent = label;
+    win.style.display = 'flex';
+    resetWinPosition();
+    player.play().catch(() => {});
+  };
+
+  window.openVimeoWin = function(id, title, label, rawUrl) {
+    player.pause();
+    player.style.display = 'none';
+    winIframe.style.display = 'block';
+    winIframe.src = rawUrl ? id : `https://player.vimeo.com/video/${id}?autoplay=1`;
+    winTitle.textContent = title;
+    winLabel.textContent = label;
+    win.style.display = 'flex';
+    resetWinPosition();
+  };
+
+  window.closeVideoWin = function() {
+    player.pause();
+    player.src = '';
+    winIframe.src = '';
+    winIframe.style.display = 'none';
+    player.style.display = 'block';
+    win.style.display = 'none';
+  };
+
+  // Drag the window by its title bar
+  let dragging = false, dragDX = 0, dragDY = 0;
+
+  winBar.addEventListener('mousedown', e => {
+    if (e.target.tagName === 'BUTTON') return; // don't drag when clicking close
+    dragging = true;
+    const rect = win.getBoundingClientRect();
+    // Switch from transform centering to fixed px coords
+    win.style.left      = rect.left + 'px';
+    win.style.top       = rect.top  + 'px';
+    win.style.transform = 'none';
+    dragDX = e.clientX - rect.left;
+    dragDY = e.clientY - rect.top;
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    win.style.left = (e.clientX - dragDX) + 'px';
+    win.style.top  = (e.clientY - dragDY) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => { dragging = false; });
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && win.style.display !== 'none') window.closeVideoWin();
+  });
+
+
+})();
+</script>
+
+<script src="https://player.vimeo.com/api/player.js"></script>
+
+<!-- ════════════════════════════════════════════════
+     DESIGN ELEVATION — All new interactive effects
+════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ══════════════════════════════════════
+     1. PAGE-LOAD INTRO OVERLAY
+     Logo scales in, holds, then dissolves
+  ══════════════════════════════════════ */
+  const intro = document.getElementById('dvp-intro');
+  if (intro) {
+    // Total: 0.1s delay + ~1.1s scale-in + 0.5s hold = ~1.7s before fade
+    setTimeout(function () {
+      intro.classList.add('dvp-fade-out');
+      setTimeout(function () { intro.style.display = 'none'; }, 850);
+    }, 1750);
+  }
+
+
+  /* ══════════════════════════════════════
+     2. CUSTOM CURSOR
+     Smooth-follows mouse; context-aware
+  ══════════════════════════════════════ */
+  var cursor     = document.getElementById('dvp-cursor');
+  var cursorLbl  = document.getElementById('dvp-cursor-label');
+  var isFine     = window.matchMedia('(pointer: fine)').matches;
+
+  if (cursor && isFine) {
+    var mx = -100, my = -100, cx = -100, cy = -100;
+
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+    });
+
+    (function animCursor() {
+      cx += (mx - cx) * 0.10;
+      cy += (my - cy) * 0.10;
+      cursor.style.left = cx + 'px';
+      cursor.style.top  = cy + 'px';
+      requestAnimationFrame(animCursor);
+    })();
+
+    document.addEventListener('mouseover', function (e) {
+      var t = e.target;
+      if (t.closest('.video-card:not(.scrambled)')) {
+        cursor.className = 'c-play';
+        cursorLbl.textContent = 'PLAY';
+      } else if (t.closest('a, button, [role="button"]')) {
+        cursor.className = 'c-cta';
+        cursorLbl.textContent = '→';
+      } else if (t.closest('input, textarea, select')) {
+        cursor.className = 'c-text';
+        cursorLbl.textContent = '';
+      } else {
+        cursor.className = '';
+        cursorLbl.textContent = '';
+      }
+    });
+  } else if (cursor) {
+    cursor.style.display = 'none';
+  }
+
+
+  /* ══════════════════════════════════════
+     3. NAV BRAND — hide at top, reveal on scroll
+     Disappears when hero is in view;
+     slides in once user scrolls past hero
+  ══════════════════════════════════════ */
+  var navBrand = document.getElementById('nav-brand');
+  if (navBrand) {
+    function updateNavBrand() {
+      var threshold = window.innerHeight * 0.55;
+      if (window.scrollY > threshold) {
+        navBrand.classList.add('nav-brand-show');
+      } else {
+        navBrand.classList.remove('nav-brand-show');
+      }
+    }
+    window.addEventListener('scroll', updateNavBrand, { passive: true });
+    updateNavBrand();
+  }
+
+
+  /* ══════════════════════════════════════
+     4. NAV ACTIVE SECTION INDICATOR
+     Coral underline follows current section
+  ══════════════════════════════════════ */
+  var navLinks = Array.from(document.querySelectorAll('.nav-link[href^="#"]'));
+  var sections = Array.from(document.querySelectorAll('section[id]'));
+
+  function updateActiveNav() {
+    var sy = window.scrollY + 120; // offset for nav height
+    var activeId = '';
+    sections.forEach(function (sec) {
+      if (sy >= sec.offsetTop) activeId = sec.id;
+    });
+    navLinks.forEach(function (link) {
+      var lid = link.getAttribute('href').slice(1);
+      link.classList.toggle('nav-active', lid === activeId);
+    });
+  }
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+
+
+  /* ══════════════════════════════════════
+     5. SECTION H2 TEXT SCRAMBLE
+     Reuses DVP encrypt aesthetic on headings;
+     fires once when heading enters viewport
+  ══════════════════════════════════════ */
+  var SC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*[]{}|/\\~';
+
+  function scrambleTextNodes(el, duration) {
+    // Walk all text nodes, preserve HTML structure (spans, brs, etc.)
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    var nodes = [];
+    var n;
+    while ((n = walker.nextNode())) {
+      if (n.textContent.trim()) nodes.push({ node: n, orig: n.textContent });
+    }
+    var frames = Math.round(duration / 38);
+    var frame  = 0;
+    var iv = setInterval(function () {
+      frame++;
+      var progress = frame / frames;
+      nodes.forEach(function (nd) {
+        var orig = nd.orig;
+        var result = '';
+        for (var i = 0; i < orig.length; i++) {
+          if (orig[i] === ' ' || orig[i] === '\n') {
+            result += orig[i];
+          } else if (progress > (i / orig.length) * 1.15) {
+            result += orig[i]; // resolved
+          } else {
+            result += SC[Math.floor(Math.random() * SC.length)];
+          }
+        }
+        nd.node.textContent = result;
+      });
+      if (frame >= frames) {
+        clearInterval(iv);
+        nodes.forEach(function (nd) { nd.node.textContent = nd.orig; });
+      }
+    }, 38);
+  }
+
+  // Tag all section h2s
+  document.querySelectorAll('section h2').forEach(function (el) {
+    el.classList.add('scramble-h2');
+  });
+
+  var h2Obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        scrambleTextNodes(entry.target, 950);
+        h2Obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.55 });
+
+  document.querySelectorAll('.scramble-h2').forEach(function (el) {
+    h2Obs.observe(el);
+  });
+
+
+  /* ══════════════════════════════════════
+     6. SCROLL REVEAL — cards & sections
+     Elements below fold fade+rise into view
+  ══════════════════════════════════════ */
+  var revealTargets = [
+    '#services .card-bg',
+    '#ai-reel .card-bg',
+    '#portfolio .card-bg',
+    '#tools .card-bg',
+    '#about .grid > div',
+    '#contact .card-bg',
+  ];
+
+  function isInViewport(el) {
+    var r = el.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+
+  var rvObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        rvObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  revealTargets.forEach(function (sel) {
+    document.querySelectorAll(sel).forEach(function (el, i) {
+      if (isInViewport(el)) return; // skip above-fold items
+      el.classList.add('rv');
+      el.style.transitionDelay = (i % 4 * 85) + 'ms';
+      rvObs.observe(el);
+    });
+  });
+
+
+  /* ══════════════════════════════════════
+     7. STAT COUNTER ROLL-UP
+     Numbers animate 0 → target on scroll
+  ══════════════════════════════════════ */
+  function parseStat(text) {
+    // "20+" → {n:20, s:"+"} | "50K+" → {n:50, s:"K+"} | "100%" → {n:100, s:"%"}
+    var m = text.trim().match(/^(\d+)(.*)/);
+    return m ? { n: parseInt(m[1]), s: m[2] } : null;
+  }
+
+  function countUp(el, target, suffix, dur) {
+    var t0 = performance.now();
+    (function update(now) {
+      var elapsed  = now - t0;
+      var progress = Math.min(elapsed / dur, 1);
+      var eased    = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      el.textContent = Math.round(eased * target) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+      else el.textContent = target + suffix;
+    })(performance.now());
+  }
+
+  var statObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var el     = entry.target;
+      var parsed = parseStat(el.textContent);
+      if (parsed) countUp(el, parsed.n, parsed.s, 1700);
+      statObs.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+
+  document.querySelectorAll('.stat-number').forEach(function (el) {
+    statObs.observe(el);
+  });
+
+
+  /* ══════════════════════════════════════
+     8. PER-SECTION GLOW COLORS
+     Swap radial glow hue per section
+     (enhances existing partial glows)
+  ══════════════════════════════════════ */
+  var sectionGlows = {
+    'services':  'rgba(255,45,120,.14)',
+    'ai-reel':   'rgba(56,180,255,.10)',
+    'portfolio': 'rgba(255,115,56,.10)',
+    'tools':     'rgba(255,115,56,.09)',
+    'about':     'rgba(255,202,40,.09)',
+    'contact':   'rgba(255,45,120,.14)',
+  };
+
+  Object.keys(sectionGlows).forEach(function (id) {
+    var sec = document.getElementById(id);
+    if (!sec) return;
+    var color = sectionGlows[id];
+    // Add or replace the ambient glow div
+    var glow = document.createElement('div');
+    glow.style.cssText = [
+      'position:absolute', 'inset:0', 'pointer-events:none', 'z-index:0',
+      'background:radial-gradient(ellipse 75% 55% at 50% 50%,' + color + ' 0%,transparent 70%)',
+    ].join(';');
+    sec.insertBefore(glow, sec.firstChild);
+  });
+
+})();
+</script>
+</body>
+</html>
