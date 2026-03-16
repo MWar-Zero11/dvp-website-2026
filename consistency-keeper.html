@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Consistency Keeper — DynamicVibe Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #181818;
+    --border: #2a2a2a;
+    --accent: #e8a020;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --muted: #888;
+    --success: #4ade80;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .brand span { color: var(--accent); }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    background: rgba(232, 160, 32, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(232, 160, 32, 0.3);
+    padding: 4px 10px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  h1 .accent { color: var(--accent); }
+
+  .hero p {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 560px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* MAIN LAYOUT */
+  .main { padding: 48px 0 80px; }
+
+  .tool-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 700px) {
+    .tool-layout { grid-template-columns: 1fr; }
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: rgba(232, 160, 32, 0.1);
+    border: 1px solid rgba(232, 160, 32, 0.25);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .panel-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+
+  .panel-body { padding: 20px; }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    border-radius: 3px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 160, 32, 0.08);
+  }
+
+  textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  /* PLATFORM TOGGLES */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .platform-toggle {
+    position: relative;
+  }
+
+  .platform-toggle input { display: none; }
+
+  .platform-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .platform-toggle input:checked + label {
+    border-color: var(--accent);
+    background: rgba(232, 160, 32, 0.08);
+    color: var(--accent);
+  }
+
+  .platform-toggle label:hover {
+    border-color: #444;
+    color: var(--text);
+  }
+
+  .platform-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* SHOT COUNT */
+  .count-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .count-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .count-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .count-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--accent);
+    min-width: 32px;
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* GENERATE BUTTON */
+  .generate-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-top: 24px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+
+  .generate-btn:hover::before { transform: translateX(0); }
+  .generate-btn:hover { background: #f0a820; }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .generate-btn:disabled::before { display: none; }
+
+  /* OUTPUT PANEL */
+  .output-panel {
+    grid-column: 1 / -1;
+    display: none;
+  }
+
+  .output-panel.visible { display: block; }
+
+  /* LOADING */
+  .loading-state {
+    padding: 48px 20px;
+    text-align: center;
+    display: none;
+  }
+
+  .loading-state.visible { display: block; }
+
+  .loader {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .loader span {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .loader span:nth-child(2) { animation-delay: 0.2s; }
+  .loader span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .loading-state p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* PROMPT CARDS */
+  .prompts-grid {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .prompt-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt-card:nth-child(2) { animation-delay: 0.05s; }
+  .prompt-card:nth-child(3) { animation-delay: 0.1s; }
+  .prompt-card:nth-child(4) { animation-delay: 0.15s; }
+  .prompt-card:nth-child(5) { animation-delay: 0.2s; }
+
+  .prompt-card-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .prompt-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .shot-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+
+  .platform-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    padding: 2px 7px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .tag-kling { background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+  .tag-runway { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+  .tag-veo { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .tag-midjourney { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--success); color: var(--success); }
+
+  .prompt-text {
+    padding: 14px;
+    font-size: 0.85rem;
+    color: #ccc;
+    line-height: 1.7;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* CONSISTENCY NOTES */
+  .consistency-notes {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(232, 160, 32, 0.04);
+  }
+
+  .notes-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .notes-label::before {
+    content: '◆';
+    font-size: 0.5rem;
+  }
+
+  .notes-text {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ERROR */
+  .error-state {
+    padding: 24px 20px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 80, 80, 0.06);
+    border-top: 1px solid rgba(255, 80, 80, 0.2);
+  }
+
+  .error-state.visible { display: flex; }
+
+  .error-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .error-text {
+    font-size: 0.85rem;
+    color: #f87171;
+    line-height: 1.5;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 0;
+    margin-top: 0;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .footer-link {
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-link:hover { text-decoration: underline; }
+
+  /* DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0;
+  }
+
+  /* COPY ALL BTN */
+  .copy-all-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 7px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .copy-all-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .output-actions {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .output-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+
+  .output-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* HELP TEXT */
+  .help-text {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+
+  .char-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: #444;
+    float: right;
+    margin-top: 4px;
+  }
+
+  /* BYOK KEY PANEL */
+  .key-panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 32px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .key-panel.active { border-color: rgba(232, 160, 32, 0.4); }
+
+  .key-panel-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .key-panel-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .key-icon {
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+
+  .key-panel-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+
+  .key-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .key-status.empty {
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .key-status.set {
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+  }
+
+  .key-panel-body {
+    padding: 0 20px 18px;
+    border-top: 1px solid var(--border);
+  }
+
+  .key-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 14px;
+  }
+
+  .key-input-row input {
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .key-save-btn {
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+
+  .key-save-btn:hover { background: #f0a820; }
+
+  .key-clear-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    padding: 10px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .key-clear-btn:hover { border-color: #f87171; color: #f87171; }
+
+  .key-help {
+    font-size: 0.73rem;
+    color: #444;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  .key-help a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .key-help a:hover { text-decoration: underline; }
+
+  .key-warning {
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="https://dynamicvibe.net" class="brand">Dynamic<span>Vibe</span> Productions</a>
+      <span class="badge">AI Filmmaking Tools</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">New Tool · Beta</div>
+    <h1>Consistency<br><span class="accent">Keeper</span></h1>
+    <p>Define your visual anchor — character, location, or scene — and generate multiple consistent AI video prompts that hold the look, feel, and style across every shot.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<main class="main">
+  <div class="container">
+    <!-- BYOK API KEY PANEL -->
+    <div class="key-panel" id="keyPanel">
+      <div class="key-panel-header">
+        <div class="key-panel-left">
+          <span class="key-icon">⬡</span>
+          <span class="key-panel-title">Your Anthropic API Key</span>
+          <span class="key-status empty" id="keyStatus">Not set</span>
+        </div>
+        <button class="key-clear-btn" id="keyClearBtn" onclick="clearKey()" style="display:none;">✕ Clear Key</button>
+      </div>
+      <div class="key-panel-body">
+        <div class="key-input-row">
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" oninput="onKeyInput()" />
+          <button class="key-save-btn" onclick="saveKey()">Save Key</button>
+        </div>
+        <div class="key-warning">
+          <span>⚠</span>
+          <span>Your key is stored only in your browser (localStorage). It never touches our servers. You are billed directly by Anthropic — each generation costs approx $0.01–$0.03.</span>
+        </div>
+        <div class="key-help">
+          No key yet? <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get one free at console.anthropic.com →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-layout">
+
+      <!-- ANCHOR PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-number">01</div>
+          <div class="panel-title">Define Your Anchor</div>
+        </div>
+        <div class="panel-body">
+
+          <div class="field">
+            <label>Subject Type</label>
+            <select id="subjectType">
+              <option value="character">Character / Person</option>
+              <option value="location">Location / Environment</option>
+              <option value="scene">Full Scene (Character + Location)</option>
+              <option value="object">Object / Vehicle / Prop</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Anchor Description</label>
+            <textarea id="anchorDesc" placeholder="Describe your subject in detail. For a character: appearance, clothing, age, build. For a location: setting, time of day, architecture, mood..." rows="5"></textarea>
+            <div class="help-text">Be specific — this is the visual DNA that carries across every shot.</div>
+          </div>
+
+          <div class="field">
+            <label>Visual Style & Color Grade</label>
+            <input type="text" id="colorGrade" placeholder="e.g. Neon-drenched cyberpunk, warm golden hour, cold desaturated thriller..." />
+          </div>
+
+          <div class="field">
+            <label>Camera & Lens Style</label>
+            <input type="text" id="cameraStyle" placeholder="e.g. Anamorphic 35mm, handheld documentary, clinical 50mm locked-off..." />
+          </div>
+
+          <div class="field">
+            <label>Lighting Signature</label>
+            <input type="text" id="lighting" placeholder="e.g. Hard rim light from left, overhead practicals, soft diffused overcast..." />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SHOTS PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-number">02</div>
+          <div class="panel-title">Describe Your Shots</div>
+        </div>
+        <div class="panel-body">
+
+          <div class="field">
+            <label>What shots do you need?</label>
+            <textarea id="shotRequests" placeholder="Describe each shot or variation you need. e.g:&#10;— Close-up of her face, turning slowly toward camera&#10;— Wide shot walking through a crowded market&#10;— Tracking shot, running down a dark alley&#10;— Slow-mo product reveal on a table..." rows="6"></textarea>
+            <div class="help-text">One shot per line, or describe them naturally — Claude will parse it.</div>
+          </div>
+
+          <div class="field">
+            <label>Action / Motion Notes</label>
+            <input type="text" id="motionNotes" placeholder="e.g. All shots slow motion, dynamic push-ins, mostly static..." />
+          </div>
+
+          <div class="field">
+            <label>Number of Prompt Variations</label>
+            <div class="count-row">
+              <button class="count-btn" onclick="adjustCount(-1)">−</button>
+              <div class="count-display" id="countDisplay">3</div>
+              <button class="count-btn" onclick="adjustCount(1)">+</button>
+              <span style="font-size:0.8rem;color:var(--muted);">prompts per shot</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Target Platforms</label>
+            <div class="platform-grid">
+              <div class="platform-toggle">
+                <input type="checkbox" id="p-kling" value="Kling 3.0" checked>
+                <label for="p-kling"><span class="platform-dot"></span>Kling 3.0</label>
+              </div>
+              <div class="platform-toggle">
+                <input type="checkbox" id="p-runway" value="Runway Gen-4">
+                <label for="p-runway"><span class="platform-dot"></span>Runway Gen-4</label>
+              </div>
+              <div class="platform-toggle">
+                <input type="checkbox" id="p-veo" value="Veo 3">
+                <label for="p-veo"><span class="platform-dot"></span>Veo 3</label>
+              </div>
+              <div class="platform-toggle">
+                <input type="checkbox" id="p-mj" value="Midjourney V7">
+                <label for="p-mj"><span class="platform-dot"></span>Midjourney V7</label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- GENERATE BUTTON - spans full width -->
+      <div style="grid-column: 1 / -1;">
+        <button class="generate-btn" id="generateBtn" onclick="generatePrompts()">
+          ◆ Generate Consistent Prompts
+        </button>
+      </div>
+
+      <!-- OUTPUT PANEL -->
+      <div class="panel output-panel" id="outputPanel">
+
+        <div class="output-actions">
+          <div>
+            <div class="output-title">Generated Prompts</div>
+            <div class="output-subtitle" id="outputMeta">—</div>
+          </div>
+          <button class="copy-all-btn" onclick="copyAll()">
+            <span>⧉</span> Copy All
+          </button>
+        </div>
+
+        <!-- LOADING -->
+        <div class="loading-state" id="loadingState">
+          <div class="loader">
+            <span></span><span></span><span></span>
+          </div>
+          <p>Building consistent prompts...</p>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error-state" id="errorState">
+          <div class="error-icon">⚠</div>
+          <div class="error-text" id="errorText">Something went wrong. Please try again.</div>
+        </div>
+
+        <!-- PROMPTS GRID -->
+        <div class="prompts-grid" id="promptsGrid"></div>
+
+        <!-- CONSISTENCY NOTES -->
+        <div class="consistency-notes" id="consistencyNotes" style="display:none;">
+          <div class="notes-label">Consistency Lock</div>
+          <div class="notes-text" id="notesText"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-copy">© 2026 DynamicVibe Productions · Marc Warfield</div>
+      <a href="https://dynamicvibe.net/cineprompt/" class="footer-link">← CinePrompt</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  let shotCount = 3;
+  const KEY_STORAGE = 'dvp_ck_api_key';
+
+  // ── KEY MANAGEMENT ──────────────────────────────────────────
+  function loadSavedKey() {
+    const saved = localStorage.getItem(KEY_STORAGE);
+    if (saved) {
+      document.getElementById('apiKeyInput').value = saved;
+      setKeyStatus(true);
+    }
+  }
+
+  function onKeyInput() {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val) setKeyStatus(false);
+  }
+
+  function saveKey() {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val) { alert('Please paste your Anthropic API key first.'); return; }
+    if (!val.startsWith('sk-ant-')) {
+      alert('That doesn\'t look like an Anthropic API key — it should start with "sk-ant-".');
+      return;
+    }
+    localStorage.setItem(KEY_STORAGE, val);
+    setKeyStatus(true);
+  }
+
+  function clearKey() {
+    localStorage.removeItem(KEY_STORAGE);
+    document.getElementById('apiKeyInput').value = '';
+    setKeyStatus(false);
+  }
+
+  function setKeyStatus(isSet) {
+    const status = document.getElementById('keyStatus');
+    const clearBtn = document.getElementById('keyClearBtn');
+    const panel = document.getElementById('keyPanel');
+    if (isSet) {
+      status.textContent = '✓ Key saved';
+      status.className = 'key-status set';
+      clearBtn.style.display = 'block';
+      panel.classList.add('active');
+    } else {
+      status.textContent = 'Not set';
+      status.className = 'key-status empty';
+      clearBtn.style.display = 'none';
+      panel.classList.remove('active');
+    }
+  }
+
+  function getKey() {
+    return localStorage.getItem(KEY_STORAGE) || document.getElementById('apiKeyInput').value.trim();
+  }
+
+  // ── SHOT COUNT ───────────────────────────────────────────────
+  function adjustCount(delta) {
+    shotCount = Math.min(6, Math.max(1, shotCount + delta));
+    document.getElementById('countDisplay').textContent = shotCount;
+  }
+
+  function getSelectedPlatforms() {
+    return Array.from(document.querySelectorAll('.platform-toggle input:checked'))
+      .map(el => el.value);
+  }
+
+  function getPlatformClass(platform) {
+    if (platform.includes('Kling')) return 'tag-kling';
+    if (platform.includes('Runway')) return 'tag-runway';
+    if (platform.includes('Veo')) return 'tag-veo';
+    if (platform.includes('Midjourney')) return 'tag-mj';
+    return '';
+  }
+
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function copyAll() {
+    const allPrompts = Array.from(document.querySelectorAll('.prompt-text'))
+      .map(el => el.textContent.trim())
+      .join('\n\n---\n\n');
+    navigator.clipboard.writeText(allPrompts);
+  }
+
+  function showError(msg) {
+    document.getElementById('loadingState').classList.remove('visible');
+    document.getElementById('errorState').classList.add('visible');
+    document.getElementById('errorText').textContent = msg;
+  }
+
+  function renderPrompts(prompts, notes, platforms) {
+    document.getElementById('loadingState').classList.remove('visible');
+
+    const grid = document.getElementById('promptsGrid');
+    grid.innerHTML = '';
+
+    prompts.forEach((item, i) => {
+      const card = document.createElement('div');
+      card.className = 'prompt-card';
+      card.style.animationDelay = (i * 0.05) + 's';
+
+      const platformTag = item.platform
+        ? `<span class="platform-tag ${getPlatformClass(item.platform)}">${item.platform}</span>`
+        : '';
+
+      card.innerHTML = `
+        <div class="prompt-card-header">
+          <div class="prompt-meta">
+            <span class="shot-label">Shot ${i + 1}${item.shot ? ' · ' + item.shot : ''}</span>
+            ${platformTag}
+          </div>
+          <button class="copy-btn" onclick="copyText(this.closest('.prompt-card').querySelector('.prompt-text').textContent, this)">Copy</button>
+        </div>
+        <div class="prompt-text">${item.prompt}</div>
+      `;
+      grid.appendChild(card);
+    });
+
+    if (notes) {
+      document.getElementById('notesText').textContent = notes;
+      document.getElementById('consistencyNotes').style.display = 'block';
+    }
+
+    const platList = platforms.join(', ');
+    document.getElementById('outputMeta').textContent =
+      `${prompts.length} prompts · ${platList}`;
+  }
+
+  async function generatePrompts() {
+    const apiKey = getKey();
+    if (!apiKey) {
+      // Scroll to key panel and highlight it
+      document.getElementById('keyPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('apiKeyInput').focus();
+      showKeyPanelError();
+      return;
+    }
+
+    const anchor = document.getElementById('anchorDesc').value.trim();
+    const shotRequests = document.getElementById('shotRequests').value.trim();
+
+    if (!anchor) { alert('Please describe your anchor subject first.'); return; }
+    if (!shotRequests) { alert('Please describe the shots you need.'); return; }
+
+    const platforms = getSelectedPlatforms();
+    if (platforms.length === 0) { alert('Please select at least one platform.'); return; }
+
+    const subjectType = document.getElementById('subjectType').value;
+    const colorGrade = document.getElementById('colorGrade').value.trim();
+    const cameraStyle = document.getElementById('cameraStyle').value.trim();
+    const lighting = document.getElementById('lighting').value.trim();
+    const motionNotes = document.getElementById('motionNotes').value.trim();
+
+    const outputPanel = document.getElementById('outputPanel');
+    outputPanel.classList.add('visible');
+    document.getElementById('loadingState').classList.add('visible');
+    document.getElementById('errorState').classList.remove('visible');
+    document.getElementById('promptsGrid').innerHTML = '';
+    document.getElementById('consistencyNotes').style.display = 'none';
+    document.getElementById('generateBtn').disabled = true;
+
+    outputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const systemPrompt = `You are an expert AI filmmaking prompt director with deep knowledge of AI video platforms including Kling, Runway, Veo, and Midjourney. Your specialty is maintaining visual consistency across multiple shots — ensuring a character's appearance, scene lighting, color grade, and cinematic style remain locked between prompts.
+
+You return ONLY valid JSON. No markdown, no explanation, no code fences. Just raw JSON.`;
+
+    const userPrompt = `Create consistent AI video prompts for the following project.
+
+SUBJECT TYPE: ${subjectType}
+
+ANCHOR (Visual DNA — must be preserved in every prompt):
+${anchor}
+
+VISUAL STYLE: ${colorGrade || 'cinematic, film-like'}
+CAMERA & LENS: ${cameraStyle || 'cinematic, professional'}
+LIGHTING: ${lighting || 'dramatic, cinematic lighting'}
+MOTION NOTES: ${motionNotes || 'natural, cinematic motion'}
+
+SHOTS NEEDED:
+${shotRequests}
+
+TARGET PLATFORMS: ${platforms.join(', ')}
+
+Generate ${shotCount} prompts. Spread them across the target platforms (assign each prompt to one platform and tailor the prompt syntax for that platform's strengths).
+
+Return JSON in this exact format:
+{
+  "prompts": [
+    {
+      "shot": "brief shot name",
+      "platform": "platform name",
+      "prompt": "the full AI video prompt optimized for this platform"
+    }
+  ],
+  "consistency_notes": "A brief paragraph explaining the key visual elements that were locked across all prompts to maintain consistency — what a director should watch for when reviewing the outputs."
+}
+
+Each prompt should:
+- Embed the full anchor description naturally so each prompt works standalone
+- Be optimized for the specific platform's syntax and strengths
+- Maintain exact visual consistency in: appearance, lighting quality, color grade, lens feel
+- Vary only in: shot type, action, camera angle — as requested`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userPrompt }]
+        })
+      });
+
+      if (response.status === 401) {
+        throw new Error('Invalid API key. Please check your key and try again.');
+      }
+      if (response.status === 429) {
+        throw new Error('Rate limit hit — please wait a moment and try again.');
+      }
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}. Check your key and credits.`);
+      }
+
+      const data = await response.json();
+      const text = data.content
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('');
+
+      let parsed;
+      try {
+        const clean = text.replace(/```json|```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch (e) {
+        throw new Error('Could not parse response. Please try again.');
+      }
+
+      if (!parsed.prompts || !Array.isArray(parsed.prompts)) {
+        throw new Error('Unexpected response format. Please try again.');
+      }
+
+      renderPrompts(parsed.prompts, parsed.consistency_notes, platforms);
+
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      document.getElementById('generateBtn').disabled = false;
+    }
+  }
+
+  function showKeyPanelError() {
+    const panel = document.getElementById('keyPanel');
+    panel.style.borderColor = '#f87171';
+    panel.style.boxShadow = '0 0 0 3px rgba(248,113,113,0.1)';
+    setTimeout(() => {
+      panel.style.borderColor = '';
+      panel.style.boxShadow = '';
+    }, 2500);
+  }
+
+  // Init
+  loadSavedKey();
+</script>
+
+</body>
+</html>
