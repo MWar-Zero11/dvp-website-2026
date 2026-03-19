@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CineRoute — DynamicVibe Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #080808;
+    --bg2:     #0f0f0f;
+    --bg3:     #161616;
+    --bg4:     #1c1c1c;
+    --border:  #242424;
+    --border2: #2e2e2e;
+    --accent:  #e8a020;
+    --accent2: #ff6b35;
+    --route:   #00d4ff;
+    --text:    #efefef;
+    --muted:   #777;
+    --dim:     #444;
+    --success: #4ade80;
+    --warn:    #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* GRAIN */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 0;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .brand:hover { color: var(--text); }
+  .brand span { color: var(--accent); }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--accent); }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    background: rgba(0, 212, 255, 0.08);
+    color: var(--route);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 56px 0 44px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--route) 40%, var(--accent) 60%, transparent 100%);
+    opacity: 0.3;
+    animation: scanPulse 4s ease-in-out infinite;
+  }
+
+  @keyframes scanPulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.5; }
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    color: var(--route);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 1px;
+    background: var(--route);
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 0.93;
+    letter-spacing: 0.02em;
+    margin-bottom: 18px;
+  }
+
+  h1 .accent { color: var(--accent); }
+  h1 .route-col { color: var(--route); }
+
+  .hero-desc {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 520px;
+    font-weight: 300;
+    line-height: 1.75;
+  }
+
+  /* ── MAIN ── */
+  .main { padding: 44px 0 80px; }
+
+  /* ── DIMENSION SECTIONS ── */
+  .dim-section {
+    margin-bottom: 28px;
+  }
+
+  .dim-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dim-label::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 1px;
+    background: var(--dim);
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    cursor: pointer;
+    user-select: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--dim);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 16px;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+
+  .chip:hover {
+    border-color: var(--border2);
+    color: var(--muted);
+  }
+
+  .chip.active {
+    border-color: rgba(232, 160, 32, 0.5);
+    background: rgba(232, 160, 32, 0.08);
+    color: var(--accent);
+  }
+
+  /* ── DIVIDER ── */
+  .rule {
+    height: 1px;
+    background: var(--border);
+    margin: 36px 0;
+  }
+
+  /* ── RESULTS ── */
+  .results-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .results-label::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 1px;
+    background: var(--route);
+  }
+
+  .results-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── PLATFORM CARDS ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .card.top {
+    border-color: rgba(232, 160, 32, 0.4);
+    box-shadow: 0 0 20px rgba(232, 160, 32, 0.05);
+  }
+
+  .card-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .rank-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .rank-1 {
+    background: rgba(232, 160, 32, 0.15);
+    color: var(--accent);
+    border: 1px solid rgba(232, 160, 32, 0.4);
+  }
+  .rank-2 {
+    background: var(--bg3);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .rank-3 {
+    background: var(--bg2);
+    color: var(--dim);
+    border: 1px solid var(--border);
+  }
+
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+
+  .card-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .card-score {
+    margin-left: auto;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+
+  .score-track {
+    height: 2px;
+    background: var(--border);
+    margin: 0 20px;
+  }
+
+  .score-fill {
+    height: 100%;
+    transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .card-body {
+    padding: 14px 20px 18px;
+  }
+
+  .card-reason {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .caution {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--warn);
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 2px;
+    padding: 4px 10px;
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    h1 { font-size: 2.8rem; }
+    .card-header { flex-wrap: wrap; gap: 10px; }
+    .card-score { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="index.html" class="brand">DYNAMIC<span>VIBE</span></a>
+      <div class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <span class="badge">CineRoute</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">Platform Router</div>
+    <h1>WHERE DOES THIS<br><span class="route-col">SHOT</span> <span class="accent">BELONG?</span></h1>
+    <p class="hero-desc">
+      Dial in five dimensions of your shot. The ranked platforms update instantly — with the reasoning behind every call.
+    </p>
+  </div>
+</section>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div class="container">
+
+    <!-- DIMENSIONS -->
+    <div id="dimensions">
+
+      <div class="dim-section">
+        <div class="dim-label">Motion Intensity</div>
+        <div class="chip-row" data-dim="motion">
+          <span class="chip active" data-val="0">Still / Locked</span>
+          <span class="chip"        data-val="1">Slow &amp; Deliberate</span>
+          <span class="chip"        data-val="2">Moderate</span>
+          <span class="chip"        data-val="3">High Action</span>
+          <span class="chip"        data-val="4">Extreme / Chaos</span>
+        </div>
+      </div>
+
+      <div class="dim-section">
+        <div class="dim-label">Dialogue &amp; Sync</div>
+        <div class="chip-row" data-dim="dialogue">
+          <span class="chip active" data-val="0">No Dialogue</span>
+          <span class="chip"        data-val="1">Background / ADR</span>
+          <span class="chip"        data-val="2">Lip Sync Required</span>
+        </div>
+      </div>
+
+      <div class="dim-section">
+        <div class="dim-label">Visual Style</div>
+        <div class="chip-row" data-dim="style">
+          <span class="chip active" data-val="0">Photorealistic</span>
+          <span class="chip"        data-val="1">Cinematic / Film</span>
+          <span class="chip"        data-val="2">Stylised / Artistic</span>
+          <span class="chip"        data-val="3">Abstract / Experimental</span>
+        </div>
+      </div>
+
+      <div class="dim-section">
+        <div class="dim-label">Scene Complexity</div>
+        <div class="chip-row" data-dim="complexity">
+          <span class="chip active" data-val="0">Single Subject</span>
+          <span class="chip"        data-val="1">Multi-Element</span>
+          <span class="chip"        data-val="2">Complex Composition</span>
+          <span class="chip"        data-val="3">Full Narrative Arc</span>
+        </div>
+      </div>
+
+      <div class="dim-section">
+        <div class="dim-label">Shot Importance</div>
+        <div class="chip-row" data-dim="importance">
+          <span class="chip active" data-val="0">B-Roll / Filler</span>
+          <span class="chip"        data-val="1">Supporting Scene</span>
+          <span class="chip"        data-val="2">Key Moment</span>
+          <span class="chip"        data-val="3">Hero / Title Shot</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="rule"></div>
+
+    <!-- RESULTS -->
+    <div class="results-label">Recommended Platforms</div>
+    <div id="results" class="results-grid"></div>
+
+    <!-- FOOTER -->
+    <footer>
+      <span>DVP CineRoute — March 2026</span>
+      <span>Based on current model capabilities</span>
+    </footer>
+
+  </div>
+</div>
+
+<script>
+// ── PLATFORM DATA ────────────────────────────────────────────────────────────
+const PLATFORMS = {
+  'Kling 2.0': {
+    tagline: 'Motion & Physical Realism',
+    accent:  '#ff6b35',
+    scores: {
+      motion:     [4, 6, 8, 10, 10],
+      dialogue:   [10, 6, 2],
+      style:      [10, 9, 5, 2],
+      complexity: [8, 9, 7, 5],
+      importance: [7, 8, 9, 9]
+    },
+    wins: {
+      motion:   'leads on physical simulation and motion realism — purpose-built for action',
+      style:    'photorealistic output is its native mode; real-world textures render flawlessly',
+      dialogue: 'no dialogue constraints means full focus on movement accuracy',
+    },
+    cautions: {
+      dialogue: ['Lip sync required', 'Not optimised for lip sync — route speaking characters to Veo 3'],
+      motion:   ['Still shot', 'Motion realism is the main draw — consider Pika for static or locked shots'],
+    }
+  },
+
+  'Veo 3': {
+    tagline: 'Dialogue, Audio & Narrative',
+    accent:  '#4285F4',
+    scores: {
+      motion:     [7, 8, 7, 6, 4],
+      dialogue:   [5, 8, 10],
+      style:      [7, 9, 5, 3],
+      complexity: [5, 7, 8, 10],
+      importance: [4, 7, 9, 10]
+    },
+    wins: {
+      dialogue:   'the clear leader for lip sync — native audio generation included',
+      complexity: 'understands narrative arcs and maintains scene continuity better than most models',
+      importance: 'quality ceiling makes it worth the investment for hero shots with story weight',
+    },
+    cautions: {
+      motion: ['Extreme / Chaos', 'Extreme motion is outside its sweet spot — Kling 2.0 handles chaos better'],
+    }
+  },
+
+  'Runway Gen-4': {
+    tagline: 'Stylised VFX & Artistic Control',
+    accent:  '#8B5CF6',
+    scores: {
+      motion:     [6, 7, 8, 7, 6],
+      dialogue:   [7, 6, 3],
+      style:      [4, 6, 10, 10],
+      complexity: [5, 7, 8, 7],
+      importance: [5, 6, 9, 10]
+    },
+    wins: {
+      style:      'unmatched for stylised and experimental aesthetics — reference consistency keeps hero shots locked',
+      importance: 'reliable for high-stakes VFX where creative control and consistency both matter',
+      motion:     'handles a wide motion range while preserving the artistic treatment',
+    },
+    cautions: {
+      dialogue: ['Lip sync required', 'Dialogue accuracy is limited — route lip sync shots to Veo 3'],
+      style:    ['Photorealistic', 'Realism is not its native mode — consider Kling 2.0 for photo-real output'],
+    }
+  },
+
+  'Sora': {
+    tagline: 'Complex Narrative & World Consistency',
+    accent:  '#10B981',
+    scores: {
+      motion:     [5, 7, 8, 8, 7],
+      dialogue:   [7, 7, 5],
+      style:      [5, 9, 8, 5],
+      complexity: [3, 6, 10, 10],
+      importance: [3, 5, 8, 10]
+    },
+    wins: {
+      complexity: 'the strongest model for narrative arcs — world geometry and scene logic stay consistent',
+      style:      'cinematic treatment with deep spatial understanding produces film-quality framing',
+      importance: 'hero and title shots with world-building demands are where Sora earns its keep',
+    },
+    cautions: {
+      complexity: ['Single Subject', 'Simple shots under-utilise Sora — faster options like Pika are more cost-effective'],
+      dialogue:   ['Lip sync required', 'Not the strongest for accurate lip sync — Veo 3 leads here'],
+    }
+  },
+
+  'Pika': {
+    tagline: 'Fast Iterations & B-Roll',
+    accent:  '#f59e0b',
+    scores: {
+      motion:     [9, 9, 7, 4, 2],
+      dialogue:   [8, 7, 4],
+      style:      [7, 7, 8, 6],
+      complexity: [10, 8, 4, 2],
+      importance: [10, 9, 4, 2]
+    },
+    wins: {
+      complexity: 'fastest turnaround for simple, single-subject shots — ideal for b-roll iteration',
+      importance: 'most cost-effective choice for b-roll and supporting material',
+      motion:     'excels at controlled, deliberate movement — great for slow reveals and product shots',
+    },
+    cautions: {
+      motion:     ['High Action', 'High-action and chaos will push Pika past its ceiling — Kling 2.0 handles it better'],
+      complexity: ['Full Narrative Arc', 'Narrative-arc complexity will strain Pika — escalate to Sora or Veo 3'],
+      importance: ['Hero / Title Shot', 'For hero shots, invest in a higher-ceiling platform'],
+    }
+  },
+
+  'Hailuo': {
+    tagline: 'Cinematic Drama & Emotion',
+    accent:  '#f43f5e',
+    scores: {
+      motion:     [4, 8, 9, 8, 5],
+      dialogue:   [8, 7, 4],
+      style:      [5, 10, 7, 4],
+      complexity: [4, 8, 9, 7],
+      importance: [5, 7, 9, 9]
+    },
+    wins: {
+      style:      'native cinematic quality — deep focus, dramatic lighting and film texture built in',
+      motion:     'fluid motion with emotional weight; camera feel mimics practised cinematography',
+      complexity: 'multi-element dramatic scenes with strong composition are its home ground',
+    },
+    cautions: {
+      style:    ['Photorealistic', 'Photorealism is not its strength — Kling 2.0 is the better call'],
+      dialogue: ['Lip sync required', 'Lip sync accuracy is limited — Veo 3 owns this territory'],
+    }
+  }
+};
+
+const DIMS = ['motion', 'dialogue', 'style', 'complexity', 'importance'];
+const CHIP_LABELS = {
+  motion:     ['Still / Locked','Slow & Deliberate','Moderate','High Action','Extreme / Chaos'],
+  dialogue:   ['No Dialogue','Background / ADR','Lip Sync Required'],
+  style:      ['Photorealistic','Cinematic / Film','Stylised / Artistic','Abstract / Experimental'],
+  complexity: ['Single Subject','Multi-Element','Complex Composition','Full Narrative Arc'],
+  importance: ['B-Roll / Filler','Supporting Scene','Key Moment','Hero / Title Shot'],
+};
+
+const sel = { motion:0, dialogue:0, style:0, complexity:0, importance:0 };
+
+// ── SCORING ──────────────────────────────────────────────────────────────────
+function rawScore(name) {
+  return DIMS.reduce((s, d) => s + PLATFORMS[name].scores[d][sel[d]], 0);
+}
+function maxScore(name) {
+  return DIMS.reduce((s, d) => s + Math.max(...PLATFORMS[name].scores[d]), 0);
+}
+function pct(name) {
+  return Math.round((rawScore(name) / maxScore(name)) * 100);
+}
+
+// ── REASONING ────────────────────────────────────────────────────────────────
+function buildReason(name) {
+  const p   = PLATFORMS[name];
+  const out = { reasons: [], caution: null };
+
+  const myScores = DIMS.map(d => ({ d, s: p.scores[d][sel[d]] }));
+  myScores.sort((a,b) => b.s - a.s);
+
+  for (const { d } of myScores) {
+    if (p.wins[d] && out.reasons.length < 2) out.reasons.push(p.wins[d]);
+  }
+
+  for (const [dim, entries] of Object.entries(p.cautions || {})) {
+    const [chipLabel, msg] = entries;
+    const activeLabel = CHIP_LABELS[dim][sel[dim]];
+    if (activeLabel === chipLabel) { out.caution = msg; break; }
+  }
+
+  return out;
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const sorted = Object.keys(PLATFORMS)
+    .map(n => ({ n, p: pct(n) }))
+    .sort((a,b) => b.p - a.p)
+    .slice(0, 3);
+
+  const rankClasses = ['rank-1', 'rank-2', 'rank-3'];
+
+  document.getElementById('results').innerHTML = sorted.map(({ n, p }, i) => {
+    const plat = PLATFORMS[n];
+    const isTop = i === 0;
+    const { reasons, caution } = buildReason(n);
+    const reasonText = reasons.join(' · ');
+
+    const scoreColor = isTop ? 'var(--accent)' : 'var(--dim)';
+    const barBg = isTop
+      ? 'linear-gradient(90deg, var(--accent), var(--accent2))'
+      : `linear-gradient(90deg, ${plat.accent}bb, ${plat.accent}44)`;
+    const tagStyle = `background:${plat.accent}15;color:${plat.accent};border:1px solid ${plat.accent}30`;
+
+    return `
+      <div class="card ${isTop ? 'top' : ''}">
+        <div class="card-header">
+          <div class="rank-badge ${rankClasses[i]}">${i + 1}</div>
+          <span class="card-name">${n}</span>
+          <span class="card-tag" style="${tagStyle}">${plat.tagline}</span>
+          <div class="card-score" style="color:${scoreColor}">${p}%</div>
+        </div>
+        <div class="score-track">
+          <div class="score-fill" style="width:${p}%;background:${barBg}"></div>
+        </div>
+        <div class="card-body">
+          ${reasonText ? `<p class="card-reason">${reasonText}</p>` : ''}
+          ${caution    ? `<div class="caution">⚠ ${caution}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── CHIP INTERACTION ─────────────────────────────────────────────────────────
+document.querySelectorAll('[data-dim]').forEach(group => {
+  const dim = group.dataset.dim;
+  group.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      sel[dim] = parseInt(chip.dataset.val, 10);
+      render();
+    });
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
