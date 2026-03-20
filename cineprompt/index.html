@@ -560,7 +560,13 @@
     <img src="../images/DVP_LOGO UseMe.jpg" alt="DVP" style="width:30px;height:30px;border-radius:7px;object-fit:cover;">
     <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.875rem;color:#dde8f8;">DynamicVibe <span style="background:linear-gradient(135deg,#ff7338,#ff2d78);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Productions</span></span>
   </a>
-  <a href="../index.html" style="font-family:'DM Sans',sans-serif;font-size:0.8rem;color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">← Back to main site</a>
+  <div style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;">
+    <a href="/framedna/" style="color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">FrameDNA</a>
+    <span style="color:#2d4a6a;">→</span>
+    <span style="color:#ff7338;">CinePrompt</span>
+    <span style="color:#2d4a6a;">→</span>
+    <a href="/consistency-keeper/" style="color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">Consistency Keeper</a>
+  </div>
 </nav>
 
 <div class="wrap">
@@ -1113,6 +1119,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copy Prompt
         </button>
+        <button class="btn-copy" id="btn-send-ck" onclick="sendToConsistencyKeeper()" style="background:rgba(255,45,120,0.1);border-color:rgba(255,45,120,0.3);color:#ff2d78;">
+          → Lock with Consistency Keeper
+        </button>
         <button class="btn-regen" id="btn-regen">Regenerate</button>
       </div>
     </div>
@@ -1414,6 +1423,26 @@
       panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
   }
+
+  // ── CinePrompt → Consistency Keeper export
+  function sendToConsistencyKeeper() {
+    const prompt = document.getElementById('generated-prompt').textContent.trim();
+    if (!prompt) return;
+    window.open('/consistency-keeper/?import=' + encodeURIComponent(prompt), '_blank');
+  }
+
+  // ── FrameDNA → CinePrompt import
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const imported = params.get('import');
+    if (imported) {
+      const decoded = decodeURIComponent(imported);
+      const sceneField = document.getElementById('basic-prompt');
+      if (sceneField) sceneField.value = decoded;
+      const outputField = document.getElementById('generated-prompt');
+      if (outputField) outputField.textContent = decoded;
+    }
+  });
 
   // ── Copy
   document.getElementById('btn-copy').addEventListener('click', function() {

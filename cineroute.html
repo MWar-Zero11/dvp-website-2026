@@ -6,21 +6,21 @@
 <title>CineRoute — DynamicVibe Productions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:      #080808;
-    --bg2:     #0f0f0f;
-    --bg3:     #161616;
-    --bg4:     #1c1c1c;
-    --border:  #242424;
-    --border2: #2e2e2e;
-    --accent:  #e8a020;
-    --accent2: #ff6b35;
-    --route:   #00d4ff;
-    --text:    #efefef;
-    --muted:   #777;
-    --dim:     #444;
+    --bg:      #060d18;
+    --bg2:     #0d1929;
+    --bg3:     #0d1929;
+    --bg4:     #112235;
+    --border:  #1a2d47;
+    --border2: #1e3554;
+    --accent:  #ff7338;
+    --accent2: #ff2d78;
+    --route:   #38d9d9;
+    --text:    #dde8f8;
+    --muted:   #6e8aaa;
+    --dim:     #2d4a6a;
     --success: #4ade80;
     --warn:    #f59e0b;
   }
@@ -36,13 +36,29 @@
   }
 
   /* GRAIN */
-  body::after {
+  body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.028;
     pointer-events: none;
-    z-index: 999;
+    z-index: 1000;
+  }
+
+  /* AMBIENT GLOW */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255,45,120,0.08) 0%, rgba(255,115,56,0.04) 50%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
   }
 
   .container {
@@ -85,10 +101,10 @@
   }
 
   .nav-link {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.1em;
-    color: var(--dim);
+    color: var(--muted);
     text-decoration: none;
     text-transform: uppercase;
     transition: color 0.2s;
@@ -96,12 +112,12 @@
   .nav-link:hover { color: var(--accent); }
 
   .badge {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.1em;
-    background: rgba(0, 212, 255, 0.08);
-    color: var(--route);
-    border: 1px solid rgba(0, 212, 255, 0.2);
+    background: rgba(255, 115, 56, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(255, 115, 56, 0.28);
     padding: 4px 10px;
     border-radius: 2px;
     text-transform: uppercase;
@@ -120,7 +136,7 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--route) 40%, var(--accent) 60%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 40%, var(--accent2) 60%, transparent 100%);
     opacity: 0.3;
     animation: scanPulse 4s ease-in-out infinite;
   }
@@ -131,10 +147,10 @@
   }
 
   .hero-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
     letter-spacing: 0.2em;
-    color: var(--route);
+    color: var(--accent);
     text-transform: uppercase;
     margin-bottom: 14px;
     display: flex;
@@ -147,7 +163,7 @@
     display: inline-block;
     width: 18px;
     height: 1px;
-    background: var(--route);
+    background: var(--accent);
   }
 
   h1 {
@@ -158,8 +174,8 @@
     margin-bottom: 18px;
   }
 
-  h1 .accent { color: var(--accent); }
-  h1 .route-col { color: var(--route); }
+  h1 .accent { color: var(--accent2); }
+  h1 .route-col { color: var(--accent); }
 
   .hero-desc {
     font-size: 1rem;
@@ -178,7 +194,7 @@
   }
 
   .dim-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -224,8 +240,8 @@
   }
 
   .chip.active {
-    border-color: rgba(232, 160, 32, 0.5);
-    background: rgba(232, 160, 32, 0.08);
+    border-color: rgba(255, 115, 56, 0.5);
+    background: rgba(255, 115, 56, 0.08);
     color: var(--accent);
   }
 
@@ -238,7 +254,7 @@
 
   /* ── RESULTS ── */
   .results-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -254,7 +270,7 @@
     display: inline-block;
     width: 12px;
     height: 1px;
-    background: var(--route);
+    background: var(--accent);
   }
 
   .results-grid {
@@ -269,12 +285,17 @@
     border: 1px solid var(--border);
     border-radius: 3px;
     overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .card:not(.top):hover {
+    border-color: rgba(255, 45, 120, 0.35);
+    box-shadow: 0 0 24px rgba(255, 45, 120, 0.08);
   }
 
   .card.top {
-    border-color: rgba(232, 160, 32, 0.4);
-    box-shadow: 0 0 20px rgba(232, 160, 32, 0.05);
+    border-color: rgba(255, 45, 120, 0.35);
+    box-shadow: 0 0 24px rgba(255, 45, 120, 0.08);
   }
 
   .card-header {
@@ -285,7 +306,7 @@
   }
 
   .rank-badge {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     font-weight: 600;
     width: 28px;
@@ -298,9 +319,9 @@
   }
 
   .rank-1 {
-    background: rgba(232, 160, 32, 0.15);
+    background: rgba(255, 115, 56, 0.15);
     color: var(--accent);
-    border: 1px solid rgba(232, 160, 32, 0.4);
+    border: 1px solid rgba(255, 115, 56, 0.4);
   }
   .rank-2 {
     background: var(--bg3);
@@ -321,7 +342,7 @@
   }
 
   .card-tag {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -364,7 +385,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.05em;
     color: var(--warn);
@@ -387,7 +408,7 @@
   }
 
   footer span {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
     letter-spacing: 0.08em;
     color: var(--dim);

@@ -6,17 +6,17 @@
 <title>Consistency Keeper — DynamicVibe Productions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0a;
-    --bg2: #111111;
-    --bg3: #181818;
-    --border: #2a2a2a;
-    --accent: #e8a020;
-    --accent2: #ff6b35;
-    --text: #f0f0f0;
-    --muted: #888;
+    --bg: #060d18;
+    --bg2: #0d1929;
+    --bg3: #0d1929;
+    --border: #1a2d47;
+    --accent: #ff7338;
+    --accent2: #ff2d78;
+    --text: #dde8f8;
+    --muted: #6e8aaa;
     --success: #4ade80;
   }
 
@@ -35,10 +35,25 @@
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.028;
+  }
+
+  /* AMBIENT GLOW */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255,45,120,0.08) 0%, rgba(255,115,56,0.04) 50%, transparent 70%);
     pointer-events: none;
     z-index: 0;
-    opacity: 0.4;
   }
 
   .container {
@@ -72,7 +87,7 @@
   .brand span { color: var(--accent); }
 
   .badge {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.1em;
     background: rgba(232, 160, 32, 0.12);
@@ -90,7 +105,7 @@
   }
 
   .hero-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.2em;
     color: var(--accent);
@@ -159,7 +174,7 @@
   }
 
   .panel-number {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     color: var(--accent);
     background: rgba(232, 160, 32, 0.1);
@@ -194,7 +209,7 @@
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 6px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   input, textarea, select {
@@ -249,7 +264,7 @@
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.15s;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -383,7 +398,7 @@
   .loading-state p {
     color: var(--muted);
     font-size: 0.85rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     letter-spacing: 0.08em;
   }
 
@@ -435,7 +450,7 @@
   }
 
   .platform-tag {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
     letter-spacing: 0.1em;
     padding: 2px 7px;
@@ -452,7 +467,7 @@
     background: none;
     border: 1px solid var(--border);
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.08em;
     padding: 4px 10px;
@@ -481,7 +496,7 @@
   }
 
   .notes-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.12em;
     color: var(--accent);
@@ -544,14 +559,14 @@
   .footer-copy {
     font-size: 0.75rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   .footer-link {
     font-size: 0.75rem;
     color: var(--accent);
     text-decoration: none;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     letter-spacing: 0.05em;
   }
 
@@ -569,7 +584,7 @@
     background: none;
     border: 1px solid var(--border);
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.1em;
     padding: 7px 14px;
@@ -602,7 +617,7 @@
   }
 
   .output-subtitle {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.08em;
     color: var(--muted);
@@ -618,7 +633,7 @@
   }
 
   .char-counter {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     color: #444;
     float: right;
@@ -665,7 +680,7 @@
   }
 
   .key-status {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.08em;
     padding: 3px 8px;
@@ -699,7 +714,7 @@
 
   .key-input-row input {
     flex: 1;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.8rem;
     letter-spacing: 0.04em;
   }
@@ -725,7 +740,7 @@
     background: none;
     border: 1px solid var(--border);
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.08em;
     padding: 10px 14px;
@@ -757,7 +772,7 @@
     font-size: 0.7rem;
     color: #666;
     margin-top: 6px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     display: flex;
     align-items: flex-start;
     gap: 6px;
@@ -770,8 +785,14 @@
 <header>
   <div class="container">
     <div class="header-inner">
-      <a href="https://dynamicvibe.net" class="brand">Dynamic<span>Vibe</span> Productions</a>
-      <span class="badge">AI Filmmaking Tools</span>
+      <a href="/" class="brand">Dynamic<span>Vibe</span> Productions</a>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;">
+        <a href="/framedna/" style="color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">FrameDNA</a>
+        <span style="color:#2d4a6a;">→</span>
+        <a href="/cineprompt/" style="color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">CinePrompt</a>
+        <span style="color:#2d4a6a;">→</span>
+        <span style="color:#ff7338;">Consistency Keeper</span>
+      </div>
     </div>
   </div>
 </header>
@@ -964,7 +985,7 @@
   <div class="container">
     <div class="footer-inner">
       <div class="footer-copy">© 2026 DynamicVibe Productions · Marc Warfield</div>
-      <a href="https://dynamicvibe.net/cineprompt/" class="footer-link">← CinePrompt</a>
+      <a href="/cineprompt/" class="footer-link">← CinePrompt</a>
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;">
@@ -974,6 +995,19 @@
 </footer>
 
 <script>
+  // ── CinePrompt → Consistency Keeper import
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const imported = params.get('import');
+    if (imported) {
+      const field = document.getElementById('anchorDesc');
+      if (field) {
+        field.value = decodeURIComponent(imported);
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+
   let shotCount = 3;
   const KEY_STORAGE = 'dvp_ck_api_key';
 

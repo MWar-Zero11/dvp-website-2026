@@ -3,7 +3,22 @@
     "allow": [
       "Bash(powershell:*)",
       "Bash(mkdir:*)",
-      "Bash(netlify deploy:*)"
+      "Bash(netlify deploy:*)",
+      "WebSearch",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.cloud.google.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(\"C:/Users/marcw/AppData/Roaming/uv/tools/notebooklm-mcp/Scripts/notebooklm-mcp.exe\" --help 2>&1 | head -30)",
+      "Bash(\"C:/Users/marcw/AppData/Roaming/uv/tools/notebooklm-mcp/Scripts/notebooklm-mcp.exe\" test:*)",
+      "Bash(\"C:/Users/marcw/AppData/Roaming/uv/tools/notebooklm-mcp/Scripts/notebooklm-mcp.exe\" quick-setup:*)",
+      "Bash(cd:*)",
+      "Read(//i/SRT File maker/dist/Libretto//**)",
+      "Read(//i/SRT File maker/build/Libretto//**)",
+      "Read(//i/SRT File maker//**)",
+      "Read(//i/SRT File maker/**)",
+      "Bash(python3:*)",
+      "Bash(git add:*)"
     ]
   }
 }
