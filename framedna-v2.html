@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FrameDNA v2 — DynamicVibe Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script>
+<style>
+:root {
+  --bg:#060d18; --bg2:#0d1929; --bg3:#0d1929; --bg4:#112235;
+  --border:#1a2d47; --border2:#1e3554;
+  --accent:#ff7338; --text:#dde8f8; --muted:#6e8aaa; --muted2:#2d4a6a;
+  --success:#4ade80; --dna:#39ff14; --danger:#f87171;
+  --blue:#63b3ed; --purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");background-size:200px 200px;opacity:0.028;pointer-events:none;z-index:1000}
+body::after{content:'';position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(255,45,120,0.08) 0%,rgba(255,115,56,0.04) 50%,transparent 70%);pointer-events:none;z-index:0}
+.container{max-width:1040px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* HEADER */
+header{border-bottom:1px solid var(--border);padding:18px 0;position:sticky;top:0;background:rgba(6,13,24,0.94);backdrop-filter:blur(12px);z-index:50}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.15em;color:var(--muted);text-decoration:none}
+.brand span{color:var(--accent)}
+.ver-badge{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;background:rgba(255,115,56,0.1);color:var(--accent);border:1px solid rgba(255,115,56,0.25);padding:3px 8px;border-radius:2px;text-transform:uppercase}
+
+/* HERO */
+.hero{padding:44px 0 32px;border-bottom:1px solid var(--border)}
+.eyebrow{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';display:inline-block;width:20px;height:1px;background:var(--accent)}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5.5rem);line-height:0.92;letter-spacing:0.02em;margin-bottom:12px}
+h1 .ac{color:var(--accent)}
+.hero p{font-size:0.95rem;color:var(--muted);max-width:600px;font-weight:300;line-height:1.7}
+.hero-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.htag{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.1em;padding:3px 8px;border:1px solid var(--border);border-radius:2px;color:var(--muted);text-transform:uppercase}
+.htag.new{border-color:rgba(255,115,56,0.3);color:var(--accent);background:rgba(255,115,56,0.06)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;padding:13px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all 0.15s;margin-bottom:-1px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tbadge{display:inline-block;font-size:0.5rem;padding:1px 4px;background:rgba(255,115,56,0.12);border:1px solid rgba(255,115,56,0.25);border-radius:2px;margin-left:5px;color:var(--accent);vertical-align:middle}
+
+/* MAIN */
+.main{padding:24px 0 80px}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+
+/* INPUTS */
+input,textarea,select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:9px 13px;border-radius:3px;transition:border-color 0.2s,box-shadow 0.2s;outline:none;appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,115,56,0.07)}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px;cursor:pointer}
+label{display:block;font-size:0.64rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-family:'DM Mono',monospace}
+
+/* BYOK */
+.key-panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:16px;overflow:hidden;transition:border-color 0.2s}
+.key-panel.set{border-color:rgba(74,222,128,0.25)}
+.key-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.key-head-left{display:flex;align-items:center;gap:9px}
+.key-title{font-family:'Bebas Neue',sans-serif;font-size:0.88rem;letter-spacing:0.1em}
+.kstatus{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;padding:2px 7px;border-radius:2px;text-transform:uppercase}
+.kstatus.empty{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)}
+.kstatus.ok{background:rgba(74,222,128,0.1);color:var(--success);border:1px solid rgba(74,222,128,0.3)}
+.key-body{padding:0 16px 14px;border-top:1px solid var(--border)}
+.key-row{display:flex;gap:8px;align-items:center;margin-top:11px}
+.key-row input{flex:1;font-family:'DM Mono',monospace;font-size:0.76rem}
+.ksave{background:var(--accent);color:#060d18;border:none;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:0.1em;padding:9px 14px;border-radius:3px;cursor:pointer;white-space:nowrap;transition:background 0.15s;flex-shrink:0}
+.ksave:hover{background:#e85520}
+.kclear{background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;padding:9px 12px;border-radius:3px;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;text-transform:uppercase}
+.kclear:hover{border-color:var(--danger);color:var(--danger)}
+.knote{font-size:0.68rem;color:#484848;margin-top:6px;font-family:'DM Mono',monospace;display:flex;gap:5px;line-height:1.5}
+.khelp{font-size:0.7rem;color:#404040;margin-top:4px}
+.khelp a{color:var(--accent);text-decoration:none}
+.khelp a:hover{text-decoration:underline}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:4px;cursor:pointer;transition:all 0.2s;position:relative;background:var(--bg2)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(255,115,56,0.03)}
+.upload-zone.filled{border-style:solid;border-color:rgba(255,115,56,0.25);padding:0}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;background:none;z-index:2}
+.uph{padding:36px 24px;text-align:center;pointer-events:none}
+.upicon{font-size:1.8rem;opacity:0.25;margin-bottom:10px}
+.uptitle{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:0.1em;margin-bottom:5px}
+.upsub{font-size:0.72rem;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.05em}
+.prev-img{width:100%;max-height:360px;object-fit:contain;display:block;border-radius:2px}
+.prev-overlay{position:absolute;bottom:0;left:0;right:0;padding:9px 13px;background:linear-gradient(transparent,rgba(0,0,0,0.8));display:flex;align-items:center;justify-content:space-between;z-index:3}
+.prev-fn{font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.45)}
+.prev-ch{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--accent);cursor:pointer}
+
+/* EXIF */
+.exif-panel{background:var(--bg2);border:1px solid rgba(99,179,237,0.2);border-radius:4px;margin-top:10px;overflow:hidden;display:none}
+.exif-panel.on{display:block}
+.exif-head{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.exif-head-title{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:0.1em}
+.exif-badge{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;padding:2px 6px;background:rgba(99,179,237,0.1);border:1px solid rgba(99,179,237,0.25);color:var(--blue);border-radius:2px;text-transform:uppercase;margin-left:auto}
+.exif-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--border)}
+.exif-cell{background:var(--bg3);padding:9px 12px}
+.exif-key{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;color:var(--blue);text-transform:uppercase;margin-bottom:2px}
+.exif-val{font-size:0.8rem;color:var(--text);font-weight:500}
+.exif-note{font-size:0.66rem;color:#3a3a3a;padding:6px 12px;font-family:'DM Mono',monospace;border-top:1px solid var(--border)}
+
+/* PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.panel-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.pnum{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--accent);background:rgba(255,115,56,0.08);border:1px solid rgba(255,115,56,0.2);width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0}
+.ptitle{font-family:'Bebas Neue',sans-serif;font-size:0.92rem;letter-spacing:0.1em}
+.ptitle-sub{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);letter-spacing:0.08em;margin-left:auto;text-transform:uppercase}
+.panel-body{padding:16px}
+
+/* SCAN BTN */
+.scan-btn{width:100%;padding:15px;background:var(--accent);color:#060d18;border:none;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.18em;cursor:pointer;border-radius:3px;margin:12px 0;transition:all 0.2s;position:relative;overflow:hidden}
+.scan-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.15);transform:translateX(-100%);transition:transform 0.3s}
+.scan-btn:hover::before{transform:translateX(0)}
+.scan-btn:hover{background:#e85520}
+.scan-btn:disabled{opacity:0.4;cursor:not-allowed}
+.scan-btn:disabled::before{display:none}
+
+/* LOADER */
+.scanning{display:none;text-align:center;padding:44px 20px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);margin-bottom:14px}
+.scanning.on{display:block}
+.dna-loader{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:16px}
+.db{width:3px;background:var(--accent);border-radius:2px;animation:dw 1s ease-in-out infinite}
+.db:nth-child(1){height:10px;animation-delay:0s}.db:nth-child(2){height:20px;animation-delay:.1s}.db:nth-child(3){height:32px;animation-delay:.2s}.db:nth-child(4){height:42px;animation-delay:.3s}.db:nth-child(5){height:32px;animation-delay:.4s}.db:nth-child(6){height:20px;animation-delay:.5s}.db:nth-child(7){height:10px;animation-delay:.6s}
+@keyframes dw{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+.scan-lbl{font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
+.scan-sub{font-size:0.78rem;color:var(--muted)}
+
+/* DNA CELLS */
+.dna-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
+.dc{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:10px 12px;animation:cin .3s ease forwards;opacity:0}
+@keyframes cin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.dc-label{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:3px}
+.dc-value{font-size:0.83rem;color:var(--text);font-weight:500;line-height:1.4}
+.conf-row{display:flex;align-items:center;gap:10px;margin-top:11px;padding-top:11px;border-top:1px solid var(--border)}
+.conf-label{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap}
+.conf-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .8s ease}
+.conf-pct{font-family:'DM Mono',monospace;font-size:0.66rem;color:var(--accent)}
+.scan-note{margin-top:10px;padding:9px 12px;background:rgba(255,115,56,0.04);border:1px solid rgba(255,115,56,0.1);border-radius:3px;font-size:0.78rem;color:var(--muted);font-style:italic;line-height:1.55}
+
+/* FIELDS */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:580px){.fgrid{grid-template-columns:1fr}}
+.abadge{display:inline-block;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.06em;padding:1px 4px;border-radius:2px;background:rgba(57,255,20,0.08);color:var(--dna);border:1px solid rgba(57,255,20,0.2);text-transform:uppercase;margin-left:4px;vertical-align:middle}
+
+/* PLATFORMS */
+.plat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+@media(max-width:560px){.plat-grid{grid-template-columns:repeat(2,1fr)}}
+.pt input{display:none}
+.pt label{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all 0.15s;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)}
+.pt input:checked+label{border-color:var(--accent);background:rgba(255,115,56,0.07);color:var(--accent)}
+.pdot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* PROMPT */
+.prompt-box{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:13px;font-size:0.84rem;color:#ccc;line-height:1.75;min-height:85px;white-space:pre-wrap;font-family:'DM Sans',sans-serif}
+.pactions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.btn-pr{background:var(--accent);color:#060d18;border:none;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:0.12em;padding:9px 16px;border-radius:3px;cursor:pointer;transition:all .15s}
+.btn-pr:hover{background:#e85520}
+.btn-gh{background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.61rem;letter-spacing:0.08em;text-transform:uppercase;padding:9px 13px;border-radius:3px;cursor:pointer;transition:all .15s}
+.btn-gh:hover{border-color:var(--accent);color:var(--accent)}
+.btn-gh.cp{border-color:var(--success);color:var(--success)}
+.btn-cp{background:rgba(255,115,56,0.07);border:1px solid rgba(255,115,56,0.28);color:var(--accent);font-family:'DM Mono',monospace;font-size:0.61rem;letter-spacing:0.08em;text-transform:uppercase;padding:9px 13px;border-radius:3px;cursor:pointer;transition:all .15s}
+.btn-cp:hover{background:rgba(255,115,56,0.14)}
+.regen-btn{width:100%;padding:11px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:0.88rem;letter-spacing:0.15em;cursor:pointer;border-radius:3px;margin-top:7px;transition:all .15s}
+.regen-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PROMPT HISTORY */
+.hist-strip{display:none;border-top:1px solid var(--border);padding:12px 16px}
+.hist-strip.on{display:block}
+.hist-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hist-items{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}
+.hist-item{flex-shrink:0;background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:7px 11px;cursor:pointer;max-width:190px;transition:border-color .15s}
+.hist-item:hover{border-color:var(--accent)}
+.hi-plat{font-family:'DM Mono',monospace;font-size:0.53rem;letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;margin-bottom:2px}
+.hi-text{font-size:0.7rem;color:#999;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* NAMED LOOKS */
+.looks-panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:14px;overflow:hidden}
+.looks-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid transparent;transition:border-color .2s}
+.looks-head.open{border-bottom-color:var(--border)}
+.lh-left{display:flex;align-items:center;gap:9px}
+.ltitle{font-family:'Bebas Neue',sans-serif;font-size:0.88rem;letter-spacing:0.1em}
+.lcount{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:2px;color:var(--muted)}
+.lchev{color:var(--muted);font-size:0.68rem;transition:transform .2s}
+.lchev.open{transform:rotate(180deg)}
+.looks-body{display:none;padding:12px 16px}
+.looks-body.open{display:block}
+.looks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-bottom:10px}
+.look-card{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:9px 11px;cursor:pointer;transition:all .15s;position:relative}
+.look-card:hover{border-color:var(--accent);background:rgba(255,115,56,0.04)}
+.lc-name{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.06em;color:var(--text);margin-bottom:2px}
+.lc-date{font-family:'DM Mono',monospace;font-size:0.52rem;color:var(--muted)}
+.lc-del{position:absolute;top:5px;right:7px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.68rem;padding:1px;transition:color .15s}
+.lc-del:hover{color:var(--danger)}
+.save-look-row{display:flex;gap:7px}
+.save-look-row input{flex:1}
+.slbtn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;padding:9px 12px;border-radius:3px;cursor:pointer;white-space:nowrap;transition:all .15s;text-transform:uppercase;flex-shrink:0}
+.slbtn:hover{border-color:var(--success);color:var(--success)}
+.lempty{font-size:0.76rem;color:var(--muted);font-style:italic;margin-bottom:10px}
+
+/* RECENT SCANS */
+.recent-panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:14px;overflow:hidden}
+.recent-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid transparent;transition:border-color .2s}
+.recent-head.open{border-bottom-color:var(--border)}
+.rh-left{display:flex;align-items:center;gap:9px}
+.rtitle{font-family:'Bebas Neue',sans-serif;font-size:0.88rem;letter-spacing:0.1em}
+.rcount{font-family:'DM Mono',monospace;font-size:0.58rem;padding:2px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:2px;color:var(--muted)}
+.rchev{color:var(--muted);font-size:0.68rem;transition:transform .2s}
+.rchev.open{transform:rotate(180deg)}
+.recent-body{display:none;padding:12px 16px}
+.recent-body.open{display:block}
+.recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px}
+.rc{background:var(--bg3);border:1px solid var(--border);border-radius:3px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative}
+.rc:hover{border-color:var(--accent)}
+.rc-thumb{width:100%;height:72px;object-fit:cover;display:block}
+.rc-ph{width:100%;height:72px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:1.3rem;opacity:0.18}
+.rc-info{padding:7px 9px}
+.rc-plat{font-family:'DM Mono',monospace;font-size:0.52rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px}
+.rc-date{font-family:'DM Mono',monospace;font-size:0.52rem;color:var(--muted)}
+.rc-del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.7);border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.62rem;padding:2px 5px;border-radius:2px;transition:all .15s}
+.rc-del:hover{background:rgba(248,113,113,0.85);color:#fff}
+.rclear{font-family:'DM Mono',monospace;font-size:0.58rem;background:none;border:none;color:var(--muted);cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;transition:color .15s}
+.rclear:hover{color:var(--danger)}
+.rempty{font-size:0.76rem;color:var(--muted);font-style:italic}
+
+/* COMPARE MODE */
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:620px){.cmp-grid{grid-template-columns:1fr}}
+.cmp-slot-lbl{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.cslbl-num{width:15px;height:15px;background:var(--bg3);border:1px solid var(--border);border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.58rem}
+.merge-panel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.merge-head{padding:12px 16px;border-bottom:1px solid var(--border)}
+.merge-title{font-family:'Bebas Neue',sans-serif;font-size:0.92rem;letter-spacing:0.1em}
+.merge-sub{font-size:0.74rem;color:var(--muted);margin-top:2px}
+.merge-body{padding:14px 16px}
+.merge-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.merge-row:last-child{border-bottom:none}
+.merge-attr{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);width:120px;flex-shrink:0}
+.merge-opts{display:flex;gap:5px;flex:1;flex-wrap:wrap}
+.mopt{font-size:0.72rem;padding:4px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:2px;cursor:pointer;transition:all .15s;flex:1;text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted)}
+.mopt.sel{border-color:var(--accent);background:rgba(255,115,56,0.08);color:var(--accent)}
+.mopt.empty{color:var(--muted2);font-style:italic;cursor:default}
+
+/* BATCH MODE */
+.batch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.bslot{border:2px dashed var(--border);border-radius:3px;min-height:110px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;background:var(--bg2)}
+.bslot:hover{border-color:var(--accent)}
+.bslot.filled{border-style:solid;border-color:rgba(255,115,56,0.2);padding:0}
+.bslot input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;background:none}
+.bph{text-align:center;pointer-events:none}
+.bph-num{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--border2);margin-bottom:3px}
+.bph-sub{font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--muted);text-transform:uppercase}
+.bslot-img{width:100%;height:110px;object-fit:cover;border-radius:2px;display:block}
+.bslot-rm{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.7);border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.66rem;padding:2px 5px;border-radius:2px;z-index:5}
+.batch-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:14px}
+.brc{background:var(--bg2);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.brc-head{padding:7px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.brc-num{font-family:'Bebas Neue',sans-serif;font-size:0.82rem;color:var(--accent)}
+.brc-body{padding:9px 11px}
+.brc-row{margin-bottom:4px}
+.brc-key{font-family:'DM Mono',monospace;font-size:0.53rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+.brc-val{font-size:0.76rem;color:var(--text)}
+.unified-box{background:var(--bg3);border:1px solid rgba(255,115,56,0.2);border-radius:3px;padding:13px;font-size:0.84rem;color:#ccc;line-height:1.75;min-height:85px;white-space:pre-wrap}
+
+/* ERROR */
+.err-banner{display:none;padding:11px 14px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:3px;margin-bottom:12px;font-size:0.8rem;color:var(--danger);align-items:center;gap:8px}
+.err-banner.on{display:flex}
+
+/* RESULTS */
+.results{display:none}
+.results.on{display:block}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:22px 0}
+.fi{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.fc{font-size:0.68rem;color:var(--muted);font-family:'DM Mono',monospace}
+.flinks{display:flex;gap:14px}
+.flink{font-size:0.68rem;color:var(--accent);text-decoration:none;font-family:'DM Mono',monospace}
+.flink:hover{text-decoration:underline}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 0 14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="/" class="brand">Dynamic<span>Vibe</span> Productions</a>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;">
+        <span style="color:#ff7338;">FrameDNA</span>
+        <span style="color:#2d4a6a;">→</span>
+        <a href="/cineprompt/" style="color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">CinePrompt</a>
+        <span style="color:#2d4a6a;">→</span>
+        <a href="/consistency-keeper/" style="color:#6e8aaa;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#dde8f8'" onmouseout="this.style.color='#6e8aaa'">Consistency Keeper</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Extract · Analyse · Generate</div>
+    <h1>Frame<span class="ac">DNA</span></h1>
+    <p>Drop any frame — film still, reference photo, camera shot. Extract the visual DNA, adjust the parameters, generate platform-ready AI video prompts.</p>
+    <div class="hero-tags">
+      <span class="htag new">EXIF Reader</span>
+      <span class="htag new">Compare Frames</span>
+      <span class="htag new">Batch Mode</span>
+      <span class="htag new">Named Looks</span>
+      <span class="htag new">Recent Scans</span>
+      <span class="htag new">Prompt History</span>
+      <span class="htag">Kling · Runway · Veo · Midjourney</span>
+      <span class="htag">BYOK</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchMode('single',this)">Single Frame</button>
+    <button class="tab" onclick="switchMode('compare',this)">Compare Two Frames <span class="tbadge">NEW</span></button>
+    <button class="tab" onclick="switchMode('batch',this)">Batch · Up to 5 <span class="tbadge">NEW</span></button>
+  </div>
+</div>
+
+<main class="main">
+<div class="container">
+
+<!-- BYOK -->
+<div class="key-panel" id="keyPanel">
+  <div class="key-head" onclick="toggleKeyBody()">
+    <div class="key-head-left">
+      <span style="color:var(--accent)">⬡</span>
+      <span class="key-title" style="font-family:'Bebas Neue',sans-serif;letter-spacing:0.1em;">Anthropic API Key</span>
+      <span class="kstatus empty" id="kStatus">Not set</span>
+    </div>
+    <button class="kclear" id="kClearBtn" onclick="event.stopPropagation();clearKey()" style="display:none">✕ Clear</button>
+  </div>
+  <div class="key-body" id="kBody" style="display:none">
+    <div class="key-row">
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false"/>
+      <button class="ksave" onclick="saveKey()">Save</button>
+    </div>
+    <div class="knote"><span>⚠</span><span>Stored in your browser only. Never touches our servers. ~$0.02–0.05 per scan, billed by Anthropic.</span></div>
+    <div class="khelp">No key? <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com →</a></div>
+  </div>
+</div>
+
+<!-- RECENT SCANS -->
+<div class="recent-panel">
+  <div class="recent-head" id="recentHead" onclick="toggleRecent()">
+    <div class="rh-left">
+      <span class="rtitle">Recent Scans</span>
+      <span class="rcount" id="rCount">0</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="rclear" onclick="event.stopPropagation();clearRecent()">Clear all</button>
+      <span class="rchev" id="rChev">▾</span>
+    </div>
+  </div>
+  <div class="recent-body" id="recentBody">
+    <div class="recent-grid" id="recentGrid">
+      <span class="rempty" id="rEmpty">No scans yet. Upload and scan a frame to get started.</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAMED LOOKS -->
+<div class="looks-panel">
+  <div class="looks-head" id="looksHead" onclick="toggleLooks()">
+    <div class="lh-left">
+      <span class="ltitle">Named Looks</span>
+      <span class="lcount" id="lCount">0 saved</span>
+    </div>
+    <span class="lchev" id="lChev">▾</span>
+  </div>
+  <div class="looks-body" id="looksBody">
+    <div class="looks-grid" id="looksGrid">
+      <span class="lempty" id="lEmpty">No looks saved yet. Scan a frame and save the parameters as a named look.</span>
+    </div>
+    <div class="save-look-row">
+      <input type="text" id="lookName" placeholder="Name this look (e.g. Neon Noir, Golden Hour Drama...)"/>
+      <button class="slbtn" onclick="saveLook()">✦ Save Look</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SINGLE FRAME ══ -->
+<div class="mode-panel active" id="mode-single">
+
+  <div class="upload-zone" id="upZone">
+    <input type="file" id="fileIn" accept="image/*" onchange="handleFile(event)"/>
+    <div class="uph" id="upPH">
+      <div class="upicon">◈</div>
+      <div class="uptitle">Drop a Frame Here</div>
+      <div class="upsub">JPG · PNG · WEBP · HEIC — Film stills, reference photos, camera shots</div>
+    </div>
+    <img id="prevImg" class="prev-img" style="display:none" alt=""/>
+    <div class="prev-overlay" id="prevOv" style="display:none">
+      <span class="prev-fn" id="prevFN"></span>
+      <span class="prev-ch">Change image</span>
+    </div>
+  </div>
+
+  <div class="exif-panel" id="exifPanel">
+    <div class="exif-head">
+      <span style="color:var(--blue);font-size:0.8rem">◉</span>
+      <span class="exif-head-title">Camera Data (EXIF)</span>
+      <span class="exif-badge">From File</span>
+    </div>
+    <div class="exif-grid" id="exifGrid"></div>
+    <div class="exif-note">⚠ GPS data is read locally only and never transmitted.</div>
+  </div>
+
+  <div class="err-banner" id="errBanner"><span>⚠</span><span id="errText"></span></div>
+
+  <button class="scan-btn" id="scanBtn" onclick="scanSingle()">◆ Extract DNA</button>
+
+  <div class="scanning" id="scanningEl">
+    <div class="dna-loader"><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div></div>
+    <div class="scan-lbl">Reading Cinematography</div>
+    <div class="scan-sub">Analysing shot, lens, lighting, color grade...</div>
+  </div>
+
+  <div class="results" id="resultsEl">
+
+    <div class="panel">
+      <div class="panel-head"><div class="pnum">01</div><div class="ptitle">Cinematography Breakdown</div></div>
+      <div class="panel-body">
+        <div class="dna-grid" id="dnaGrid"></div>
+        <div class="scan-note" id="scanNote" style="display:none"></div>
+        <div class="conf-row">
+          <span class="conf-label">Scan confidence</span>
+          <div class="conf-track"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+          <span class="conf-pct" id="confPct">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div class="pnum">02</div><div class="ptitle">Adjust & Refine</div><span class="ptitle-sub"><span style="color:var(--dna);font-size:0.54rem">●</span> AUTO = detected</span></div>
+      <div class="panel-body">
+        <div class="fgrid">
+          <div><label>Shot Type <span class="abadge">AUTO</span></label>
+            <select id="aShot"><option>Extreme close-up</option><option>Close-up</option><option>Medium close-up</option><option>Medium shot</option><option>Medium wide</option><option>Wide shot</option><option>Extreme wide / establishing</option><option>Over the shoulder</option><option>POV</option><option>Two shot</option><option>Insert</option></select></div>
+          <div><label>Camera Movement <span class="abadge">AUTO</span></label>
+            <select id="aMov"><option>Static / locked off</option><option>Slow push in</option><option>Pull back / reveal</option><option>Pan left</option><option>Pan right</option><option>Tilt up</option><option>Tilt down</option><option>Tracking / follow</option><option>Handheld / documentary</option><option>Crane / jib rise</option><option>Drone / aerial</option><option>Dolly zoom</option><option>360 orbit</option></select></div>
+          <div><label>Lens Feel <span class="abadge">AUTO</span></label>
+            <select id="aLens"><option>Ultra wide — 14–20mm</option><option>Wide — 24mm</option><option>Moderate wide — 28–35mm</option><option>Standard — 50mm</option><option>Short tele — 85mm</option><option>Portrait tele — 105mm</option><option>Long tele — 135–200mm</option><option>Anamorphic wide</option><option>Anamorphic standard</option><option>Macro</option></select></div>
+          <div><label>Depth of Field <span class="abadge">AUTO</span></label>
+            <select id="aDof"><option>Razor thin — subject isolated</option><option>Shallow — soft background</option><option>Moderate — some background detail</option><option>Deep — foreground to background sharp</option><option>Full depth — clinical sharpness</option></select></div>
+          <div><label>Lighting <span class="abadge">AUTO</span></label>
+            <select id="aLight"><option>Hard directional — strong shadows</option><option>Soft diffused — wrapping</option><option>Rim / backlight — glowing edges</option><option>Split lighting — half face</option><option>Practical — lamps, screens, windows</option><option>Natural overcast — flat daylight</option><option>Golden hour — warm low sun</option><option>Magic hour — dusk glow</option><option>Night / low key — deep shadows</option><option>Neon / cyberpunk practicals</option><option>High key — bright, even</option><option>Chiaroscuro — extreme contrast</option></select></div>
+          <div><label>Color Grade <span class="abadge">AUTO</span></label>
+            <select id="aGrade"><option>Warm golden — amber highlights</option><option>Cold steel — blue-grey, desaturated</option><option>Teal and orange — cinematic blockbuster</option><option>Bleach bypass — washed, gritty</option><option>Natural / clean — minimal grading</option><option>High contrast B&W</option><option>Soft B&W — gentle tones</option><option>Vintage — faded, lifted blacks</option><option>Neon saturated — vivid, electric</option><option>Day for night — dark, moonlit blue</option><option>Film emulation — grain, halation</option><option>Pastel / soft palette</option></select></div>
+          <div><label>Film Stock <span class="abadge">AUTO</span></label>
+            <select id="aFilm"><option>Digital clean — no grain</option><option>Fine grain — subtle texture</option><option>Medium grain — cinematic 35mm</option><option>Heavy grain — pushed film</option><option>16mm grain — raw, documentary</option><option>Super 8 — warm, organic, nostalgic</option><option>VHS — scan lines, colour bleed</option><option>Kodak Vision3 250D emulation</option><option>Kodak Vision3 500T emulation</option><option>Fuji Eterna emulation</option><option>Cinestill 800T emulation</option></select></div>
+          <div><label>Mood <span class="abadge">AUTO</span></label>
+            <select id="aMood"><option>Tense / thriller</option><option>Melancholic / introspective</option><option>Epic / cinematic</option><option>Intimate / quiet</option><option>Romantic / dreamy</option><option>Dark / oppressive</option><option>Euphoric / electric</option><option>Gritty / raw</option><option>Mysterious / atmospheric</option><option>Nostalgic / warm</option><option>Clinical / cold</option><option>Surreal / disorienting</option></select></div>
+        </div>
+        <div style="margin-top:11px">
+          <label>Additional notes <span style="color:#3a3a3a;font-size:0.58rem;text-transform:none;letter-spacing:0">(optional — subject, action, specific detail)</span></label>
+          <textarea id="aNotes" rows="2" placeholder="e.g. Character is a woman in her 30s, dark coat, running through rain..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div class="pnum">03</div><div class="ptitle">Platform & Prompt</div></div>
+      <div class="panel-body">
+        <label style="margin-bottom:8px;display:block">Target Platform</label>
+        <div class="plat-grid">
+          <div class="pt"><input type="radio" name="plat" id="pk" value="Kling 3.0" checked><label for="pk"><span class="pdot"></span>Kling 3.0</label></div>
+          <div class="pt"><input type="radio" name="plat" id="pr" value="Runway Gen-4"><label for="pr"><span class="pdot"></span>Runway Gen-4</label></div>
+          <div class="pt"><input type="radio" name="plat" id="pv" value="Veo 3"><label for="pv"><span class="pdot"></span>Veo 3</label></div>
+          <div class="pt"><input type="radio" name="plat" id="pm" value="Midjourney V7"><label for="pm"><span class="pdot"></span>Midjourney V7</label></div>
+        </div>
+        <div class="prompt-box" id="promptBox">Your prompt will appear here after scanning.</div>
+        <div class="pactions">
+          <button class="btn-gh" onclick="copyPrompt(this)">⧉ Copy Prompt</button>
+          <button class="btn-cp" onclick="sendToCinePrompt()">→ Open in CinePrompt</button>
+        </div>
+        <button class="regen-btn" onclick="regenPrompt()">↺ Regenerate with Current Settings</button>
+      </div>
+      <div class="hist-strip" id="histStrip">
+        <div class="hist-lbl">Prompt History (this session)</div>
+        <div class="hist-items" id="histItems"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ COMPARE MODE ══ -->
+<div class="mode-panel" id="mode-compare">
+  <div class="cmp-grid">
+    <div>
+      <div class="cmp-slot-lbl"><span class="cslbl-num">A</span> Reference Frame A</div>
+      <div class="upload-zone" id="upA">
+        <input type="file" accept="image/*" onchange="handleCompare(event,'A')"/>
+        <div class="uph"><div class="upicon">◈</div><div class="uptitle">Frame A</div><div class="upsub">Drop or click</div></div>
+        <img id="prevA" class="prev-img" style="display:none" alt=""/>
+        <div class="prev-overlay" id="povA" style="display:none"><span class="prev-fn" id="pfnA"></span><span class="prev-ch">Change</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="cmp-slot-lbl"><span class="cslbl-num">B</span> Reference Frame B</div>
+      <div class="upload-zone" id="upB">
+        <input type="file" accept="image/*" onchange="handleCompare(event,'B')"/>
+        <div class="uph"><div class="upicon">◈</div><div class="uptitle">Frame B</div><div class="upsub">Drop or click</div></div>
+        <img id="prevB" class="prev-img" style="display:none" alt=""/>
+        <div class="prev-overlay" id="povB" style="display:none"><span class="prev-fn" id="pfnB"></span><span class="prev-ch">Change</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="err-banner" id="errCmp"><span>⚠</span><span id="errCmpTxt"></span></div>
+  <button class="scan-btn" onclick="scanCompare()">◆ Scan Both Frames</button>
+
+  <div class="scanning" id="scanCmp">
+    <div class="dna-loader"><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div></div>
+    <div class="scan-lbl">Scanning Both Frames</div>
+    <div class="scan-sub">Extracting and comparing visual DNA...</div>
+  </div>
+
+  <div class="results" id="cmpResults">
+    <div class="merge-panel">
+      <div class="merge-head">
+        <div class="merge-title">Pick the Best from Each</div>
+        <div class="merge-sub">Select which frame's attribute to use in the merged prompt. Defaults to Frame A.</div>
+      </div>
+      <div class="merge-body" id="mergeBody"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="pnum">→</div><div class="ptitle">Merged Prompt</div></div>
+      <div class="panel-body">
+        <div class="plat-grid">
+          <div class="pt"><input type="radio" name="cplat" id="cpk" value="Kling 3.0" checked><label for="cpk"><span class="pdot"></span>Kling 3.0</label></div>
+          <div class="pt"><input type="radio" name="cplat" id="cpr" value="Runway Gen-4"><label for="cpr"><span class="pdot"></span>Runway Gen-4</label></div>
+          <div class="pt"><input type="radio" name="cplat" id="cpv" value="Veo 3"><label for="cpv"><span class="pdot"></span>Veo 3</label></div>
+          <div class="pt"><input type="radio" name="cplat" id="cpm" value="Midjourney V7"><label for="cpm"><span class="pdot"></span>Midjourney V7</label></div>
+        </div>
+        <div class="prompt-box" id="mergedPrompt">Scan both frames to generate a merged prompt.</div>
+        <div class="pactions" style="margin-top:9px">
+          <button class="btn-gh" onclick="copyMerged(this)">⧉ Copy Prompt</button>
+          <button class="btn-pr" onclick="genMergedPrompt()">↺ Regenerate Merged</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BATCH MODE ══ -->
+<div class="mode-panel" id="mode-batch">
+  <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Upload up to 5 reference frames. FrameDNA scans all of them and synthesises a <strong style="color:var(--text)">unified prompt</strong> capturing the common visual DNA across your entire mood board.</p>
+  <div class="batch-grid" id="batchGrid"></div>
+  <div class="err-banner" id="errBatch"><span>⚠</span><span id="errBatchTxt"></span></div>
+  <button class="scan-btn" onclick="scanBatch()">◆ Scan All & Synthesise</button>
+  <div class="scanning" id="scanBatchLoader">
+    <div class="dna-loader"><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div><div class="db"></div></div>
+    <div class="scan-lbl">Scanning All Frames</div>
+    <div class="scan-sub">Extracting DNA from each frame, then synthesising...</div>
+  </div>
+  <div class="results" id="batchResults">
+    <div class="panel" style="margin-bottom:14px">
+      <div class="panel-head"><div class="pnum">01</div><div class="ptitle">Individual Breakdowns</div></div>
+      <div class="panel-body"><div class="batch-results" id="batchBreakdowns"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="pnum">02</div><div class="ptitle">Unified Prompt</div></div>
+      <div class="panel-body">
+        <div class="plat-grid">
+          <div class="pt"><input type="radio" name="bplat" id="bpk" value="Kling 3.0" checked><label for="bpk"><span class="pdot"></span>Kling 3.0</label></div>
+          <div class="pt"><input type="radio" name="bplat" id="bpr" value="Runway Gen-4"><label for="bpr"><span class="pdot"></span>Runway Gen-4</label></div>
+          <div class="pt"><input type="radio" name="bplat" id="bpv" value="Veo 3"><label for="bpv"><span class="pdot"></span>Veo 3</label></div>
+          <div class="pt"><input type="radio" name="bplat" id="bpm" value="Midjourney V7"><label for="bpm"><span class="pdot"></span>Midjourney V7</label></div>
+        </div>
+        <div class="unified-box" id="unifiedPrompt">Scan frames to generate unified prompt.</div>
+        <div class="pactions" style="margin-top:9px">
+          <button class="btn-gh" onclick="copyUnified(this)">⧉ Copy Prompt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+</main>
+
+<footer>
+  <div class="container">
+    <div class="fi">
+      <div class="fc">© 2026 DynamicVibe Productions · Marc Warfield</div>
+      <div class="flinks">
+        <a href="https://dynamicvibe.net/cineprompt/" class="flink">CinePrompt</a>
+        <a href="https://dynamicvibe.net/consistency-keeper/" class="flink">Consistency Keeper</a>
+        <a href="https://dynamicvibe.net" class="flink">← Home</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══ CONSTANTS ═══════════════════════════════════════════════
+const KEY_STORE = 'dvp_fdna2_key';
+const RECENT_STORE = 'dvp_fdna2_recent';
+const LOOKS_STORE = 'dvp_fdna2_looks';
+const MAX_RECENT = 12;
+const MAX_LOOKS = 20;
+const MAX_HIST = 5;
+
+// ═══ STATE ═══════════════════════════════════════════════════
+let imgB64 = null, imgType = null, lastScan = null;
+let imgB64A = null, imgTypeA = null, scanA = null;
+let imgB64B = null, imgTypeB = null, scanB = null;
+let batchSlots = [null,null,null,null,null]; // {b64,type,name}
+let promptHistory = [];
+
+// ═══ KEY MANAGEMENT ══════════════════════════════════════════
+function init() {
+  const k = localStorage.getItem(KEY_STORE);
+  if (k) { document.getElementById('apiKey').value = k; setKeyStatus(true); }
+  else { document.getElementById('kBody').style.display = 'block'; }
+  renderRecent(); renderLooks(); buildBatchGrid();
+  document.querySelectorAll('input[name="plat"]').forEach(r => r.addEventListener('change', updatePromptFromScan));
+  document.querySelectorAll('input[name="cplat"]').forEach(r => r.addEventListener('change', genMergedPrompt));
+  setupDrop('upZone', f => { readFile(f, (b64,type) => { imgB64=b64; imgType=type; showPreview('upZone','upPH','prevImg','prevOv','prevFN',f.name,'data:'+type+';base64,'+b64); tryExif(f); hideErr('errBanner'); document.getElementById('resultsEl').classList.remove('on'); }); });
+  setupDrop('upA', f => { readFile(f, (b64,type) => { imgB64A=b64; imgTypeA=type; showPreview('upA',null,'prevA','povA','pfnA',f.name,'data:'+type+';base64,'+b64); }); });
+  setupDrop('upB', f => { readFile(f, (b64,type) => { imgB64B=b64; imgTypeB=type; showPreview('upB',null,'prevB','povB','pfnB',f.name,'data:'+type+';base64,'+b64); }); });
+}
+
+function toggleKeyBody() {
+  const b = document.getElementById('kBody');
+  b.style.display = b.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveKey() {
+  const v = document.getElementById('apiKey').value.trim();
+  if (!v) { alert('Paste your key first.'); return; }
+  if (!v.startsWith('sk-ant-')) { alert('Keys start with "sk-ant-"'); return; }
+  localStorage.setItem(KEY_STORE, v);
+  setKeyStatus(true);
+  document.getElementById('kBody').style.display = 'none';
+}
+
+function clearKey() {
+  localStorage.removeItem(KEY_STORE);
+  document.getElementById('apiKey').value = '';
+  setKeyStatus(false);
+  document.getElementById('kBody').style.display = 'block';
+}
+
+function setKeyStatus(ok) {
+  const s = document.getElementById('kStatus');
+  const c = document.getElementById('kClearBtn');
+  const p = document.getElementById('keyPanel');
+  s.textContent = ok ? '✓ Key saved' : 'Not set';
+  s.className = 'kstatus ' + (ok ? 'ok' : 'empty');
+  c.style.display = ok ? 'block' : 'none';
+  p.className = 'key-panel' + (ok ? ' set' : '');
+}
+
+function getKey() { return localStorage.getItem(KEY_STORE) || document.getElementById('apiKey').value.trim(); }
+
+// ═══ TABS ══════════════════════════════════════════════════
+function switchMode(id, btn) {
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('mode-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══ FILE HANDLING ═══════════════════════════════════════════
+function handleFile(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  readFile(f, (b64, type) => {
+    imgB64 = b64; imgType = type;
+    showPreview('upZone','upPH','prevImg','prevOv','prevFN', f.name, 'data:'+type+';base64,'+b64);
+    tryExif(f);
+    hideErr('errBanner');
+    document.getElementById('resultsEl').classList.remove('on');
+  });
+}
+
+function handleCompare(e, slot) {
+  const f = e.target.files[0]; if (!f) return;
+  readFile(f, (b64, type) => {
+    if (slot==='A') { imgB64A=b64; imgTypeA=type; showPreview('upA',null,'prevA','povA','pfnA',f.name,'data:'+type+';base64,'+b64); }
+    else { imgB64B=b64; imgTypeB=type; showPreview('upB',null,'prevB','povB','pfnB',f.name,'data:'+type+';base64,'+b64); }
+  });
+}
+
+function readFile(f, cb) {
+  const r = new FileReader();
+  r.onload = e => {
+    console.log('[readFile] FileReader done, file size:', f.size);
+    const img = new Image();
+    img.onerror = err => {
+      console.error('[readFile] img.onerror fired', err);
+      // fallback: send raw
+      const b64 = e.target.result.split(',')[1];
+      cb(b64, f.type);
+    };
+    img.onload = () => {
+      console.log('[readFile] img.onload fired, dims:', img.width, 'x', img.height);
+      try {
+        const canvas = document.createElement('canvas');
+        const MAX_DIM = 2000;
+        const scale = Math.min(1, MAX_DIM / Math.max(img.width, img.height));
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        const b64 = dataUrl.split(',')[1];
+        console.log('[readFile] compressed b64 length:', b64.length, '~', Math.round(b64.length*0.75/1024), 'KB');
+        cb(b64, 'image/jpeg');
+      } catch(err) {
+        console.error('[readFile] canvas failed:', err);
+        const b64 = e.target.result.split(',')[1];
+        cb(b64, f.type);
+      }
+    };
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+
+function showPreview(zoneId, phId, imgId, ovId, fnId, name, dataUrl) {
+  const zone = document.getElementById(zoneId);
+  const img = document.getElementById(imgId);
+  const ov = document.getElementById(ovId);
+  const fn = document.getElementById(fnId);
+  if (phId) document.getElementById(phId).style.display = 'none';
+  img.src = dataUrl; img.style.display = 'block';
+  if (ov) { ov.style.display = 'flex'; }
+  if (fn) fn.textContent = name;
+  zone.classList.add('filled');
+}
+
+// ═══ DRAG & DROP ═════════════════════════════════════════════
+function setupDrop(zoneId, handler) {
+  const zone = document.getElementById(zoneId);
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) handler(f);
+  });
+}
+
+// ═══ EXIF ══════════════════════════════════════════════════
+async function tryExif(file) {
+  try {
+    const data = await exifr.parse(file, { pick: ['Make','Model','LensModel','FocalLength','FNumber','ExposureTime','ISO','Flash','DateTimeOriginal','GPSLatitude','GPSLongitude'] });
+    if (!data) return;
+    const fields = [];
+    if (data.Make || data.Model) fields.push({ k:'Camera', v: [data.Make,data.Model].filter(Boolean).join(' ') });
+    if (data.LensModel) fields.push({ k:'Lens', v: data.LensModel });
+    if (data.FocalLength) fields.push({ k:'Focal Length', v: data.FocalLength + 'mm' });
+    if (data.FNumber) fields.push({ k:'Aperture', v: 'f/' + data.FNumber });
+    if (data.ExposureTime) fields.push({ k:'Shutter', v: data.ExposureTime < 1 ? '1/' + Math.round(1/data.ExposureTime) + 's' : data.ExposureTime + 's' });
+    if (data.ISO) fields.push({ k:'ISO', v: data.ISO });
+    if (data.Flash !== undefined) fields.push({ k:'Flash', v: data.Flash ? 'Fired' : 'No flash' });
+    if (data.DateTimeOriginal) fields.push({ k:'Date', v: new Date(data.DateTimeOriginal).toLocaleDateString() });
+    if (data.GPSLatitude) fields.push({ k:'GPS', v: 'Location data present' });
+    if (fields.length === 0) return;
+    const grid = document.getElementById('exifGrid');
+    grid.innerHTML = fields.map(f => `<div class="exif-cell"><div class="exif-key">${f.k}</div><div class="exif-val">${f.v}</div></div>`).join('');
+    document.getElementById('exifPanel').classList.add('on');
+  } catch(e) { /* No EXIF — silent */ }
+}
+
+// ═══ API CALL ═════════════════════════════════════════════════
+async function callAPI(messages, system, maxTokens=1200) {
+  const key = getKey();
+  if (!key) throw new Error('No API key set.');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+    body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:maxTokens, system, messages })
+  });
+  if (res.status===401) throw new Error('Invalid API key — check your key and try again.');
+  if (res.status===429) throw new Error('Rate limit hit — wait a moment and try again.');
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(`API error ${res.status}: ${e?.error?.message||'unknown'}`); }
+  const d = await res.json();
+  return d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+}
+
+function parseJSON(raw) {
+  const clean = raw.replace(/```json|```/g,'').trim();
+  return JSON.parse(clean);
+}
+
+const SCAN_SYS = `You are an expert cinematographer and film analyst. Analyse images with the precision of a DP reading a frame. Return ONLY valid JSON, no markdown, no preamble, no code fences.`;
+
+const PROMPT_SYS = `You are an expert AI video prompt director. Generate prompts optimised for specific AI platforms. Return ONLY the prompt text — nothing else.`;
+
+// ═══ SINGLE SCAN ═════════════════════════════════════════════
+async function scanSingle() {
+  if (!getKey()) { flashKey(); return; }
+  if (!imgB64) { alert('Upload a frame first.'); return; }
+  hideErr('errBanner');
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('scanningEl').classList.add('on');
+  document.getElementById('resultsEl').classList.remove('on');
+
+  const userPrompt = `Analyse this frame cinematographically. Return JSON:
+{
+  "breakdown":{"shot_type":"","camera_movement":"","lens_feel":"","depth_of_field":"","lighting_setup":"","color_grade":"","film_stock":"","mood":""},
+  "confidence":85,
+  "scan_notes":"One sentence director's commentary on what defines this frame.",
+  "prompts":{"kling":"","runway":"","veo":"","midjourney":""}
+}
+Each prompt: embed visual attributes naturally, platform-optimised syntax, written as a director giving precise instructions.`;
+
+  try {
+    const raw = await callAPI([{ role:'user', content:[
+      { type:'image', source:{ type:'base64', media_type:imgType, data:imgB64 }},
+      { type:'text', text:userPrompt }
+    ]}], SCAN_SYS);
+    lastScan = parseJSON(raw);
+    renderSingleResults(lastScan);
+    saveToRecent(lastScan);
+  } catch(e) { showErr('errBanner','errText', e.message); }
+  finally { document.getElementById('scanBtn').disabled=false; document.getElementById('scanningEl').classList.remove('on'); }
+}
+
+function renderSingleResults(data) {
+  const b = data.breakdown;
+  const cells = [
+    {l:'Shot Type',v:b.shot_type,s:'aShot'},
+    {l:'Camera Movement',v:b.camera_movement,s:'aMov'},
+    {l:'Lens Feel',v:b.lens_feel,s:'aLens'},
+    {l:'Depth of Field',v:b.depth_of_field,s:'aDof'},
+    {l:'Lighting',v:b.lighting_setup,s:'aLight'},
+    {l:'Color Grade',v:b.color_grade,s:'aGrade'},
+    {l:'Film / Texture',v:b.film_stock,s:'aFilm'},
+    {l:'Mood',v:b.mood,s:'aMood'},
+  ];
+  const grid = document.getElementById('dnaGrid');
+  grid.innerHTML = '';
+  cells.forEach((c,i) => {
+    const el = document.createElement('div');
+    el.className='dc'; el.style.animationDelay=(i*.06)+'s';
+    el.innerHTML=`<div class="dc-label">${c.l}</div><div class="dc-value">${c.v}</div>`;
+    grid.appendChild(el);
+    matchDropdown(c.s, c.v);
+  });
+  const conf = Math.min(100,Math.max(0,data.confidence||75));
+  setTimeout(() => { document.getElementById('confFill').style.width=conf+'%'; document.getElementById('confPct').textContent=conf+'%'; },200);
+  if (data.scan_notes) { document.getElementById('scanNote').textContent=data.scan_notes; document.getElementById('scanNote').style.display='block'; }
+  updatePromptFromScan();
+  document.getElementById('resultsEl').classList.add('on');
+  document.getElementById('resultsEl').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function updatePromptFromScan() {
+  if (!lastScan) return;
+  const plat = document.querySelector('input[name="plat"]:checked')?.value||'Kling 3.0';
+  let p = '';
+  if (plat.includes('Kling')) p=lastScan.prompts.kling;
+  else if (plat.includes('Runway')) p=lastScan.prompts.runway;
+  else if (plat.includes('Veo')) p=lastScan.prompts.veo;
+  else if (plat.includes('Midjourney')) p=lastScan.prompts.midjourney;
+  setPrompt(p||'No prompt for this platform.');
+}
+
+async function regenPrompt() {
+  if (!getKey()) { flashKey(); return; }
+  const plat = document.querySelector('input[name="plat"]:checked')?.value||'Kling 3.0';
+  setPrompt('Regenerating...');
+  const params = getCurrentParams();
+  try {
+    const p = await callAPI([{role:'user',content:`Generate an optimised AI video prompt for ${plat}:
+Shot: ${params.shot} | Movement: ${params.movement} | Lens: ${params.lens} | DOF: ${params.dof}
+Lighting: ${params.lighting} | Grade: ${params.grade} | Film: ${params.film} | Mood: ${params.mood}
+${params.notes ? 'Notes: '+params.notes : ''}
+Output ONLY the prompt text, nothing else.`}], PROMPT_SYS, 600);
+    setPrompt(p.trim());
+  } catch(e) { setPrompt('Regeneration failed — try again.'); }
+}
+
+function setPrompt(txt) {
+  document.getElementById('promptBox').textContent = txt;
+  addToHistory(txt);
+}
+
+// ═══ PROMPT HISTORY ═══════════════════════════════════════════
+function addToHistory(txt) {
+  if (!txt || txt.includes('appear here') || txt.includes('failed') || txt.includes('Regenerating')) return;
+  const plat = document.querySelector('input[name="plat"]:checked')?.value||'—';
+  promptHistory.unshift({plat, txt});
+  if (promptHistory.length > MAX_HIST) promptHistory.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  if (promptHistory.length === 0) return;
+  const strip = document.getElementById('histStrip');
+  const items = document.getElementById('histItems');
+  strip.classList.add('on');
+  items.innerHTML = promptHistory.map((h,i) => `
+    <div class="hist-item" onclick="restoreHistory(${i})">
+      <div class="hi-plat">${h.plat}</div>
+      <div class="hi-text">${h.txt}</div>
+    </div>`).join('');
+}
+
+function restoreHistory(i) {
+  document.getElementById('promptBox').textContent = promptHistory[i].txt;
+}
+
+// ═══ MATCH DROPDOWN ═══════════════════════════════════════════
+function matchDropdown(id, val) {
+  const sel = document.getElementById(id); if (!sel||!val) return;
+  const lv = val.toLowerCase();
+  let best=-1, score=0;
+  Array.from(sel.options).forEach((o,i) => {
+    const ot = o.text.toLowerCase();
+    const s = lv.split(/\s+/).filter(w=>w.length>3&&ot.includes(w)).length;
+    if (s>score) { score=s; best=i; }
+  });
+  if (best>=0&&score>0) sel.selectedIndex=best;
+}
+
+function getCurrentParams() {
+  return {
+    shot: document.getElementById('aShot').value,
+    movement: document.getElementById('aMov').value,
+    lens: document.getElementById('aLens').value,
+    dof: document.getElementById('aDof').value,
+    lighting: document.getElementById('aLight').value,
+    grade: document.getElementById('aGrade').value,
+    film: document.getElementById('aFilm').value,
+    mood: document.getElementById('aMood').value,
+    notes: document.getElementById('aNotes').value.trim()
+  };
+}
+
+// ═══ COPY & CINEPROMPT ════════════════════════════════════════
+function copyPrompt(btn) {
+  const t = document.getElementById('promptBox').textContent;
+  navigator.clipboard.writeText(t).then(()=>{ btn.textContent='✓ Copied'; btn.classList.add('cp'); setTimeout(()=>{ btn.textContent='⧉ Copy Prompt'; btn.classList.remove('cp'); },2000); });
+}
+
+function copyMerged(btn) {
+  const t = document.getElementById('mergedPrompt').textContent;
+  navigator.clipboard.writeText(t).then(()=>{ btn.textContent='✓ Copied'; btn.classList.add('cp'); setTimeout(()=>{ btn.textContent='⧉ Copy Prompt'; btn.classList.remove('cp'); },2000); });
+}
+
+function copyUnified(btn) {
+  const t = document.getElementById('unifiedPrompt').textContent;
+  navigator.clipboard.writeText(t).then(()=>{ btn.textContent='✓ Copied'; btn.classList.add('cp'); setTimeout(()=>{ btn.textContent='⧉ Copy Prompt'; btn.classList.remove('cp'); },2000); });
+}
+
+function sendToCinePrompt() {
+  const p = document.getElementById('promptBox').textContent;
+  if (!p||p.includes('appear here')) return;
+  window.open('https://dynamicvibe.net/cineprompt/?import='+encodeURIComponent(p),'_blank');
+}
+
+// ═══ COMPARE MODE ════════════════════════════════════════════
+async function scanCompare() {
+  if (!getKey()) { flashKey(); return; }
+  if (!imgB64A||!imgB64B) { showErr('errCmp','errCmpTxt','Upload both frames first.'); return; }
+  hideErr('errCmp');
+  document.getElementById('scanCmp').classList.add('on');
+  document.getElementById('cmpResults').classList.remove('on');
+
+  const up = `Analyse this frame. Return JSON:
+{"breakdown":{"shot_type":"","camera_movement":"","lens_feel":"","depth_of_field":"","lighting_setup":"","color_grade":"","film_stock":"","mood":""},"confidence":85}`;
+
+  try {
+    const [rawA,rawB] = await Promise.all([
+      callAPI([{role:'user',content:[{type:'image',source:{type:'base64',media_type:imgTypeA,data:imgB64A}},{type:'text',text:up}]}],SCAN_SYS,600),
+      callAPI([{role:'user',content:[{type:'image',source:{type:'base64',media_type:imgTypeB,data:imgB64B}},{type:'text',text:up}]}],SCAN_SYS,600)
+    ]);
+    scanA = parseJSON(rawA);
+    scanB = parseJSON(rawB);
+    renderMergeUI(scanA.breakdown, scanB.breakdown);
+    await genMergedPrompt();
+    document.getElementById('cmpResults').classList.add('on');
+    document.getElementById('cmpResults').scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(e) { showErr('errCmp','errCmpTxt',e.message); }
+  finally { document.getElementById('scanCmp').classList.remove('on'); }
+}
+
+function renderMergeUI(bA,bB) {
+  const attrs = [
+    {k:'shot_type',l:'Shot Type'},{k:'camera_movement',l:'Movement'},{k:'lens_feel',l:'Lens'},
+    {k:'depth_of_field',l:'Depth of Field'},{k:'lighting_setup',l:'Lighting'},
+    {k:'color_grade',l:'Color Grade'},{k:'film_stock',l:'Film Stock'},{k:'mood',l:'Mood'}
+  ];
+  document.getElementById('mergeBody').innerHTML = attrs.map(a => `
+    <div class="merge-row">
+      <div class="merge-attr">${a.l}</div>
+      <div class="merge-opts">
+        <div class="mopt sel ${!bA[a.k]?'empty':''}" onclick="selectMerge(this)" data-attr="${a.k}" data-src="A">${bA[a.k]||'—'}</div>
+        <div class="mopt ${!bB[a.k]?'empty':''}" onclick="selectMerge(this)" data-attr="${a.k}" data-src="B">${bB[a.k]||'—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function selectMerge(el) {
+  const row = el.closest('.merge-opts');
+  row.querySelectorAll('.mopt').forEach(m=>m.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+async function genMergedPrompt() {
+  if (!scanA||!scanB) return;
+  const plat = document.querySelector('input[name="cplat"]:checked')?.value||'Kling 3.0';
+  document.getElementById('mergedPrompt').textContent='Generating merged prompt...';
+  const selected = {};
+  document.querySelectorAll('.merge-row').forEach(row => {
+    const sel = row.querySelector('.mopt.sel');
+    if (sel) selected[sel.dataset.attr] = sel.textContent;
+  });
+  const params = Object.values(selected).join(', ');
+  try {
+    const p = await callAPI([{role:'user',content:`Generate an optimised AI video prompt for ${plat} combining these attributes: ${params}. Output ONLY the prompt text.`}],PROMPT_SYS,500);
+    document.getElementById('mergedPrompt').textContent=p.trim();
+  } catch(e) { document.getElementById('mergedPrompt').textContent='Failed — try again.'; }
+}
+
+// ═══ BATCH MODE ═══════════════════════════════════════════════
+function buildBatchGrid() {
+  const grid = document.getElementById('batchGrid');
+  grid.innerHTML = '';
+  for (let i=0;i<5;i++) {
+    const slot = document.createElement('div');
+    slot.className='bslot'+(batchSlots[i]?'.filled':'');
+    slot.id='bslot'+i;
+    if (batchSlots[i]) {
+      slot.classList.add('filled');
+      slot.innerHTML=`<input type="file" accept="image/*" onchange="handleBatch(event,${i})"/><img class="bslot-img" src="${'data:'+batchSlots[i].type+';base64,'+batchSlots[i].b64}"/><button class="bslot-rm" onclick="removeBatch(event,${i})">✕</button>`;
+    } else {
+      slot.innerHTML=`<input type="file" accept="image/*" onchange="handleBatch(event,${i})"/><div class="bph"><div class="bph-num">${i+1}</div><div class="bph-sub">Drop or click</div></div>`;
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function handleBatch(e,i) {
+  const f=e.target.files[0]; if(!f) return;
+  readFile(f,(b64,type)=>{
+    batchSlots[i]={b64,type,name:f.name};
+    buildBatchGrid();
+  });
+}
+
+function removeBatch(e,i) {
+  e.stopPropagation(); batchSlots[i]=null; buildBatchGrid();
+}
+
+async function scanBatch() {
+  if (!getKey()) { flashKey(); return; }
+  const active = batchSlots.filter(Boolean);
+  if (active.length<2) { showErr('errBatch','errBatchTxt','Upload at least 2 frames to batch scan.'); return; }
+  hideErr('errBatch');
+  document.getElementById('scanBatchLoader').classList.add('on');
+  document.getElementById('batchResults').classList.remove('on');
+
+  const scanPr = `Analyse this frame. Return JSON:
+{"breakdown":{"shot_type":"","camera_movement":"","lens_feel":"","depth_of_field":"","lighting_setup":"","color_grade":"","film_stock":"","mood":""},"confidence":80}`;
+
+  try {
+    const scans = await Promise.all(active.map(s =>
+      callAPI([{role:'user',content:[{type:'image',source:{type:'base64',media_type:s.type,data:s.b64}},{type:'text',text:scanPr}]}],SCAN_SYS,600)
+        .then(parseJSON)
+    ));
+
+    // Render individual breakdowns
+    const bdowns = document.getElementById('batchBreakdowns');
+    bdowns.innerHTML = scans.map((sc,i)=>`
+      <div class="brc">
+        <div class="brc-head"><span class="brc-num">Frame ${i+1}</span><span style="font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--muted)">${sc.confidence||'?'}% conf</span></div>
+        <div class="brc-body">
+          ${Object.entries(sc.breakdown).map(([k,v])=>`<div class="brc-row"><div class="brc-key">${k.replace(/_/g,' ')}</div><div class="brc-val">${v}</div></div>`).join('')}
+        </div>
+      </div>`).join('');
+
+    // Generate unified prompt
+    const plat = document.querySelector('input[name="bplat"]:checked')?.value||'Kling 3.0';
+    const summary = scans.map((sc,i)=>`Frame ${i+1}: ${Object.values(sc.breakdown).join(', ')}`).join('\n');
+    const unified = await callAPI([{role:'user',content:`Synthesise a single unified AI video prompt for ${plat} that captures the common visual DNA across these ${scans.length} reference frames:\n\n${summary}\n\nFind the common visual thread — recurring elements in lighting, grade, mood, lens style — and write one cohesive prompt. Output ONLY the prompt text.`}],PROMPT_SYS,700);
+    document.getElementById('unifiedPrompt').textContent=unified.trim();
+    document.getElementById('batchResults').classList.add('on');
+    document.getElementById('batchResults').scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(e) { showErr('errBatch','errBatchTxt',e.message); }
+  finally { document.getElementById('scanBatchLoader').classList.remove('on'); }
+}
+
+// ═══ RECENT SCANS ════════════════════════════════════════════
+function makeThumb(b64, type, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    const scale = Math.min(200/img.width, 100/img.height);
+    c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    cb(c.toDataURL('image/jpeg',0.7));
+  };
+  img.src = 'data:'+type+';base64,'+b64;
+}
+
+function saveToRecent(scan) {
+  const plat = document.querySelector('input[name="plat"]:checked')?.value||'—';
+  const date = new Date().toLocaleDateString();
+  const id = Date.now();
+  const save = (thumb) => {
+    let recent = JSON.parse(localStorage.getItem(RECENT_STORE)||'[]');
+    recent.unshift({ scan, thumb, date, plat, id });
+    if (recent.length>MAX_RECENT) recent=recent.slice(0,MAX_RECENT);
+    localStorage.setItem(RECENT_STORE,JSON.stringify(recent));
+    renderRecent();
+  };
+  if (imgB64) makeThumb(imgB64, imgType, save);
+  else save(null);
+}
+
+function renderRecent() {
+  const recent = JSON.parse(localStorage.getItem(RECENT_STORE)||'[]');
+  document.getElementById('rCount').textContent=recent.length;
+  const grid = document.getElementById('recentGrid');
+  if (recent.length===0) { grid.innerHTML='<span class="rempty">No scans yet. Upload and scan a frame to get started.</span>'; return; }
+  grid.innerHTML = recent.map(r=>`
+    <div class="rc" onclick="loadRecent(${r.id})">
+      ${r.thumb ? `<img class="rc-thumb" src="${r.thumb}" alt=""/>` : `<div class="rc-ph">◈</div>`}
+      <div class="rc-info"><div class="rc-plat">${r.plat}</div><div class="rc-date">${r.date}</div></div>
+      <button class="rc-del" onclick="event.stopPropagation();deleteRecent(${r.id})">✕</button>
+    </div>`).join('');
+}
+
+function loadRecent(id) {
+  const recent = JSON.parse(localStorage.getItem(RECENT_STORE)||'[]');
+  const r = recent.find(x=>x.id===id); if(!r) return;
+  lastScan = r.scan;
+  switchMode('single', document.querySelector('.tab'));
+  document.querySelectorAll('.tab')[0].click();
+  renderSingleResults(r.scan);
+}
+
+function deleteRecent(id) {
+  let recent = JSON.parse(localStorage.getItem(RECENT_STORE)||'[]');
+  recent = recent.filter(r=>r.id!==id);
+  localStorage.setItem(RECENT_STORE,JSON.stringify(recent));
+  renderRecent();
+}
+
+function clearRecent() {
+  if (!confirm('Clear all recent scans?')) return;
+  localStorage.removeItem(RECENT_STORE);
+  renderRecent();
+}
+
+function toggleRecent() {
+  const b=document.getElementById('recentBody'); const h=document.getElementById('recentHead'); const ch=document.getElementById('rChev');
+  const open=b.classList.toggle('open'); h.classList.toggle('open',open); ch.classList.toggle('open',open);
+}
+
+// ═══ NAMED LOOKS ══════════════════════════════════════════════
+function saveLook() {
+  const name = document.getElementById('lookName').value.trim();
+  if (!name) { alert('Give this look a name first.'); return; }
+  if (!lastScan) { alert('Scan a frame first to save its look.'); return; }
+  let looks = JSON.parse(localStorage.getItem(LOOKS_STORE)||'[]');
+  looks.unshift({ name, params:getCurrentParams(), breakdown:lastScan.breakdown, date:new Date().toLocaleDateString(), id:Date.now() });
+  if (looks.length>MAX_LOOKS) looks=looks.slice(0,MAX_LOOKS);
+  localStorage.setItem(LOOKS_STORE,JSON.stringify(looks));
+  document.getElementById('lookName').value='';
+  renderLooks();
+}
+
+function renderLooks() {
+  const looks = JSON.parse(localStorage.getItem(LOOKS_STORE)||'[]');
+  document.getElementById('lCount').textContent=looks.length+' saved';
+  const grid = document.getElementById('looksGrid');
+  const empty = document.getElementById('lEmpty');
+  if (looks.length===0) { grid.innerHTML=''; if(empty) grid.appendChild(empty); return; }
+  grid.innerHTML = looks.map(l=>`
+    <div class="look-card" onclick="loadLook(${l.id})">
+      <div class="lc-name">${l.name}</div>
+      <div class="lc-date">${l.date}</div>
+      <button class="lc-del" onclick="event.stopPropagation();deleteLook(${l.id})">✕</button>
+    </div>`).join('');
+}
+
+function loadLook(id) {
+  const looks = JSON.parse(localStorage.getItem(LOOKS_STORE)||'[]');
+  const l = looks.find(x=>x.id===id); if(!l) return;
+  const p=l.params;
+  const set = (id,v) => { if(v) document.getElementById(id).value=v; };
+  set('aShot',p.shot); set('aMov',p.movement); set('aLens',p.lens);
+  set('aDof',p.dof); set('aLight',p.lighting); set('aGrade',p.grade);
+  set('aFilm',p.film); set('aMood',p.mood);
+  if(p.notes) document.getElementById('aNotes').value=p.notes;
+  toggleLooks();
+}
+
+function deleteLook(id) {
+  let looks = JSON.parse(localStorage.getItem(LOOKS_STORE)||'[]');
+  looks = looks.filter(l=>l.id!==id);
+  localStorage.setItem(LOOKS_STORE,JSON.stringify(looks));
+  renderLooks();
+}
+
+function toggleLooks() {
+  const b=document.getElementById('looksBody'); const h=document.getElementById('looksHead'); const ch=document.getElementById('lChev');
+  const open=b.classList.toggle('open'); h.classList.toggle('open',open); ch.classList.toggle('open',open);
+}
+
+// ═══ UTILS ═══════════════════════════════════════════════════
+function showErr(bannerId, txtId, msg) { document.getElementById(txtId).textContent=msg; document.getElementById(bannerId).classList.add('on'); }
+function hideErr(id) { document.getElementById(id).classList.remove('on'); }
+function flashKey() {
+  const p=document.getElementById('keyPanel');
+  p.style.borderColor='var(--danger)'; p.style.boxShadow='0 0 0 3px rgba(248,113,113,0.1)';
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('kBody').style.display='block';
+  setTimeout(()=>{ p.style.borderColor=''; p.style.boxShadow=''; },2500);
+}
+
+// Init
+init();
+</script>
+</body>
+</html>
