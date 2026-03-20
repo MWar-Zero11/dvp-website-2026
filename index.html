@@ -441,6 +441,53 @@
       animation: hGlitch .32s steps(2) 1;
     }
 
+    /* ── Aurora orbs ── */
+    .aurora-orb-1 {
+      position: absolute;
+      width: 700px; height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,115,56,0.30) 0%, transparent 65%);
+      filter: blur(64px);
+      top: -80px; left: -100px;
+      pointer-events: none;
+      animation: orbDrift1 24s ease-in-out infinite;
+    }
+    .aurora-orb-2 {
+      position: absolute;
+      width: 560px; height: 560px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,45,120,0.26) 0%, transparent 65%);
+      filter: blur(72px);
+      top: -40px; right: -100px;
+      pointer-events: none;
+      animation: orbDrift2 30s ease-in-out infinite;
+    }
+    .aurora-orb-3 {
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(30,80,220,0.14) 0%, transparent 65%);
+      filter: blur(80px);
+      bottom: 0; left: 28%;
+      pointer-events: none;
+      animation: orbDrift3 38s ease-in-out infinite;
+    }
+    @keyframes orbDrift1 {
+      0%,100% { transform: translate(0, 0); }
+      30%     { transform: translate(90px, 70px); }
+      65%     { transform: translate(-30px, 110px); }
+    }
+    @keyframes orbDrift2 {
+      0%,100% { transform: translate(0, 0); }
+      40%     { transform: translate(-110px, 50px); }
+      75%     { transform: translate(-40px, 90px); }
+    }
+    @keyframes orbDrift3 {
+      0%,100% { transform: translate(0, 0); }
+      35%     { transform: translate(-70px, -50px); }
+      70%     { transform: translate(80px, 20px); }
+    }
+
     /* ── Hero watermark logo ── */
     .hero-wm {
       position: absolute; z-index: 2;
@@ -497,6 +544,9 @@
   style="background: linear-gradient(180deg, #060d18 0%, #09101f 50%, #060d18 100%);">
   <div class="absolute inset-0 glow-hero pointer-events-none"></div>
   <div class="absolute inset-0 dot-grid opacity-25 pointer-events-none"></div>
+  <div class="aurora-orb-1"></div>
+  <div class="aurora-orb-2"></div>
+  <div class="aurora-orb-3"></div>
   <!-- Hero watermark logo -->
   <img src="images/DVP_LOGO UseMe.jpg" alt="" class="hero-wm" aria-hidden="true" />
 
@@ -938,315 +988,121 @@
 
 <!-- ══════════════════════ AI TOOLS ══════════════════════ -->
 <section id="tools" class="relative py-24 px-6 overflow-hidden" style="border-top:1px solid #0f1e30;">
-  <div class="absolute inset-0 pointer-events-none"
-    style="background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,115,56,.07) 0%, rgba(255,45,120,.05) 40%, transparent 70%);"></div>
+  <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,115,56,.07) 0%, rgba(255,45,120,.05) 40%, transparent 70%);"></div>
   <div class="max-w-5xl mx-auto relative z-10">
 
-    <div class="text-center mb-12">
-      <span class="section-label mb-3 block">AI Tools</span>
-      <h2 class="text-4xl font-extrabold text-white mb-4" style="letter-spacing:-.02em;">
-        Built-In Prompt Tools
-      </h2>
-      <p class="text-sm max-w-md mx-auto" style="color:#4e6280; line-height:1.75;">
-        Free browser-based tools for crafting AI image and video prompts — no account, no API key required.
-      </p>
+    <!-- INTRO -->
+    <div class="flex items-end justify-between gap-6 mb-12 flex-wrap">
+      <div>
+        <span class="section-label mb-3 block">Free Browser Tools</span>
+        <h2 class="text-4xl font-extrabold text-white" style="letter-spacing:-.02em; line-height:1.1;">
+          Built for<br>
+          <span class="gradient-text">AI Filmmakers</span>
+        </h2>
+      </div>
+      <div class="text-right">
+        <p class="text-sm mb-3" style="color:#4e6280; line-height:1.75; max-width:340px;">
+          Three tools. One workflow. Extract the visual DNA from any frame, build platform-ready prompts, lock consistency across every shot.
+        </p>
+        <a href="/ai-filmmaking/" class="text-xs font-semibold transition-opacity hover:opacity-75"
+          style="color:#ff7338; letter-spacing:.06em; text-transform:uppercase;">
+          View full AI Filmmaking Suite →
+        </a>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="tools-grid">
-
-      <!-- CinePrompt -->
-      <div class="card-bg card-glow rounded-2xl overflow-hidden" style="border-color:#1a2d47;">
-        <!-- Top accent bar -->
-        <div style="height:3px;background:linear-gradient(90deg,#ff7338,#ff2d78);"></div>
-        <div class="p-7 flex flex-col gap-5 h-full">
-          <!-- Header -->
-          <div class="flex items-start gap-4">
-            <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(255,115,56,.15),rgba(255,45,120,.12));border:1px solid rgba(255,45,120,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#ff7338">
-                <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
-              </svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 flex-wrap mb-1">
-                <h3 class="text-white font-bold" style="font-size:1.1rem;">CinePrompt</h3>
-                <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(255,115,56,.12);color:#ff7338;border:1px solid rgba(255,115,56,.28);">VIDEO &amp; IMAGE</span>
-              </div>
-              <p class="text-xs" style="color:#6e8aaa;">Cinematic AI Prompt Builder</p>
-            </div>
-          </div>
-          <!-- Description -->
-          <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
-            Build professional cinematic prompts for <strong style="color:#6e8aaa;">Kling 3.0</strong>,
-            <strong style="color:#6e8aaa;">Runway Gen-4</strong>,
-            <strong style="color:#6e8aaa;">Nano Banana 2</strong> and
-            <strong style="color:#6e8aaa;">Midjourney V7</strong> —
-            with step-by-step controls for camera body, lens, aperture, shot type, camera movement,
-            lighting, color grade, film stock and texture.
-          </p>
-          <!-- Feature chips -->
-          <div class="flex flex-wrap gap-2">
-            <span class="skill-tag">8 Platforms</span>
-            <span class="skill-tag">Camera Controls</span>
-            <span class="skill-tag">Lighting</span>
-            <span class="skill-tag">Color Grade</span>
-            <span class="skill-tag">Film Texture</span>
-          </div>
-          <!-- CTA -->
-          <a href="cineprompt/index.html"
-            class="btn-primary px-6 py-3 rounded-xl font-semibold text-sm mt-auto"
-            style="text-align:center;display:block;letter-spacing:.02em;">
-            Launch CinePrompt →
-          </a>
+    <!-- AI FILMMAKING SUITE BLOCK -->
+    <div class="card-bg card-glow rounded-2xl overflow-hidden mb-4" style="border-color:#1a2d47;">
+      <div style="height:3px; background:linear-gradient(90deg,#ff7338,#ff2d78);"></div>
+      <div class="flex items-center justify-between flex-wrap gap-3 px-7 py-5" style="border-bottom:1px solid #0f1e30;">
+        <div class="flex items-center gap-2">
+          <div style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#ff7338,#ff2d78);"></div>
+          <span class="text-xs font-semibold uppercase" style="letter-spacing:.12em; color:#ff7338;">AI Filmmaking Suite</span>
         </div>
+        <a href="/ai-filmmaking/" class="btn-secondary text-xs font-semibold px-4 py-2 rounded-lg"
+          style="letter-spacing:.06em; text-transform:uppercase; font-size:11px;">
+          View All Tools →
+        </a>
       </div>
+      <div class="grid gap-0 p-6" style="grid-template-columns: 1fr auto 1fr auto 1fr;">
+        <a href="/framedna/" class="rounded-xl p-5 block transition-colors" style="background:#0d1929; border:1px solid #1a2d47; text-decoration:none;" onmouseover="this.style.borderColor='rgba(255,45,120,.35)'" onmouseout="this.style.borderColor='#1a2d47'">
+          <div class="text-xs mb-2" style="color:#4e6280; letter-spacing:.1em; text-transform:uppercase; font-size:10px;">01 · Extract</div>
+          <div class="font-bold text-white mb-1" style="font-size:1.05rem;">Frame<span class="gradient-text">DNA</span></div>
+          <div class="text-xs mb-2" style="color:#ff7338; letter-spacing:.06em; text-transform:uppercase; font-size:10px;">Scan any frame</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Drop a reference image. Get the full cinematographic breakdown — shot, lens, lighting, grade, mood.</p>
+        </a>
+        <div class="hidden md:flex items-center justify-center px-2" style="color:#1a2d47; font-size:1rem;">→</div>
+        <a href="/cineprompt/" class="rounded-xl p-5 block transition-colors" style="background:#0d1929; border:1px solid #1a2d47; text-decoration:none;" onmouseover="this.style.borderColor='rgba(255,45,120,.35)'" onmouseout="this.style.borderColor='#1a2d47'">
+          <div class="text-xs mb-2" style="color:#4e6280; letter-spacing:.1em; text-transform:uppercase; font-size:10px;">02 · Build</div>
+          <div class="font-bold text-white mb-1" style="font-size:1.05rem;">Cine<span class="gradient-text">Prompt</span></div>
+          <div class="text-xs mb-2" style="color:#ff7338; letter-spacing:.06em; text-transform:uppercase; font-size:10px;">Build your prompt</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Full cinematographic control. Outputs optimised prompts for Kling, Runway, Veo &amp; Midjourney.</p>
+        </a>
+        <div class="hidden md:flex items-center justify-center px-2" style="color:#1a2d47; font-size:1rem;">→</div>
+        <a href="/consistency-keeper/" class="rounded-xl p-5 block transition-colors" style="background:#0d1929; border:1px solid #1a2d47; text-decoration:none;" onmouseover="this.style.borderColor='rgba(255,45,120,.35)'" onmouseout="this.style.borderColor='#1a2d47'">
+          <div class="text-xs mb-2" style="color:#4e6280; letter-spacing:.1em; text-transform:uppercase; font-size:10px;">03 · Lock</div>
+          <div class="font-bold text-white mb-1" style="font-size:1.05rem;">Consistency <span class="gradient-text">Keeper</span></div>
+          <div class="text-xs mb-2" style="color:#ff7338; letter-spacing:.06em; text-transform:uppercase; font-size:10px;">Lock the look</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Generate multiple shots that hold the same visual DNA across your entire sequence.</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- UTILITY TOOLS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="tools-grid">
 
       <!-- JSON Prompt Builder -->
-      <div class="card-bg card-glow rounded-2xl overflow-hidden" style="border-color:#1a2d47;">
-        <!-- Top accent bar -->
-        <div style="height:3px;background:linear-gradient(90deg,#ffca28,#ff7338);"></div>
-        <div class="p-7 flex flex-col gap-5 h-full">
-          <!-- Header -->
-          <div class="flex items-start gap-4">
-            <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(255,202,40,.12),rgba(255,115,56,.1));border:1px solid rgba(255,202,40,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffca28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-              </svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 flex-wrap mb-1">
-                <h3 class="text-white font-bold" style="font-size:1.1rem;">JSON Prompt Builder</h3>
-                <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(255,202,40,.1);color:#ffca28;border:1px solid rgba(255,202,40,.28);">NB2</span>
-              </div>
-              <p class="text-xs" style="color:#6e8aaa;">NanoBanana 2 · Structured JSON</p>
-            </div>
-          </div>
-          <!-- Description -->
-          <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
-            Type a natural language description and get a fully structured
-            <strong style="color:#6e8aaa;">JSON prompt</strong> for
-            <strong style="color:#6e8aaa;">NanoBanana 2</strong> (Gemini 3.1 Flash Image) instantly —
-            with automatic detection of subject, style, lighting and scene, plus manual overrides
-            for every camera, composition and quality parameter.
-          </p>
-          <!-- Feature chips -->
-          <div class="flex flex-wrap gap-2">
-            <span class="skill-tag">Auto-detect</span>
-            <span class="skill-tag">7 Control Sections</span>
-            <span class="skill-tag">Materials</span>
-            <span class="skill-tag">Character ID</span>
-            <span class="skill-tag">Live Output</span>
-          </div>
-          <!-- CTA -->
-          <a href="json-prompt/index.html"
-            class="px-6 py-3 rounded-xl font-semibold text-sm mt-auto"
-            style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(255,202,40,.14),rgba(255,115,56,.1));border:1px solid rgba(255,202,40,.35);color:#ffca28;transition:opacity .2s;"
-            onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-            Launch JSON Builder →
-          </a>
+      <a href="/json-prompt/" class="card-bg card-glow rounded-2xl p-5 flex items-center gap-4" style="border-color:#1a2d47; text-decoration:none;">
+        <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(255,202,40,.12),rgba(255,115,56,.1));border:1px solid rgba(255,202,40,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffca28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
         </div>
-      </div>
-
-      <!-- SRT Maker — spans full width as a desktop download tool -->
-      <div class="card-bg card-glow rounded-2xl overflow-hidden md:col-span-2" style="border-color:#1a2d47;">
-        <!-- Top accent bar -->
-        <div style="height:3px;background:linear-gradient(90deg,#38d9d9,#5b8dee);"></div>
-        <div class="p-7 flex flex-col md:flex-row gap-8">
-          <!-- Left: header + description -->
-          <div class="flex flex-col gap-5 flex-1">
-            <div class="flex items-start gap-4">
-              <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.1));border:1px solid rgba(56,217,217,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2"/>
-                  <path d="M7 9h10M7 12h6M7 15h8"/>
-                </svg>
-              </div>
-              <div>
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                  <h3 class="text-white font-bold" style="font-size:1.1rem;">SRT Maker</h3>
-                  <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(56,217,217,.1);color:#38d9d9;border:1px solid rgba(56,217,217,.28);">DESKTOP APP</span>
-                </div>
-                <p class="text-xs" style="color:#6e8aaa;">AI Subtitle &amp; Transcription · Windows &amp; Mac</p>
-              </div>
-            </div>
-            <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
-              Drop any audio or video file and get a properly formatted
-              <strong style="color:#6e8aaa;">.srt subtitle file</strong> in seconds —
-              powered by <strong style="color:#6e8aaa;">OpenAI Whisper</strong> running entirely on your machine.
-              Supports <strong style="color:#6e8aaa;">Italian, German, French and English</strong> with
-              automatic language detection. No internet required after first model download.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="skill-tag">Fully Offline</span>
-              <span class="skill-tag">Whisper AI</span>
-              <span class="skill-tag">Drag &amp; Drop</span>
-              <span class="skill-tag">5 Languages</span>
-              <span class="skill-tag">Batch Queue</span>
-              <span class="skill-tag">Fast / Balanced / Best</span>
-            </div>
-          </div>
-          <!-- Right: CTA -->
-          <div class="flex flex-col gap-3 justify-center md:min-w-[200px]">
-            <a href="srt-maker/index.html"
-              class="px-6 py-3 rounded-xl font-semibold text-sm"
-              style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(56,217,217,.14),rgba(91,141,238,.1));border:1px solid rgba(56,217,217,.35);color:#38d9d9;transition:opacity .2s;"
-              onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-              Learn More &amp; Download →
-            </a>
-            <p class="text-xs text-center" style="color:#4e6280;">Windows 10/11 · macOS Apple Silicon</p>
-          </div>
+        <div>
+          <div class="font-semibold text-white text-sm mb-1">JSON Prompt Builder</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Structured JSON prompts for NanoBanana 2 — auto-detect subject, style, lighting.</p>
         </div>
-      </div>
+      </a>
 
-
-      <!-- Lyria Music Maker — spans full width -->
-      <div class="card-bg card-glow rounded-2xl overflow-hidden md:col-span-2" style="border-color:#1a2d47;">
-        <!-- Top accent bar -->
-        <div style="height:3px;background:linear-gradient(90deg,#c47beb,#ff2d78);"></div>
-        <div class="p-7 flex flex-col md:flex-row gap-8">
-          <!-- Left: header + description -->
-          <div class="flex flex-col gap-5 flex-1">
-            <div class="flex items-start gap-4">
-              <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(196,123,235,.12),rgba(255,45,120,.1));border:1px solid rgba(196,123,235,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c47beb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 18V5l12-2v13"/>
-                  <circle cx="6" cy="18" r="3"/>
-                  <circle cx="18" cy="16" r="3"/>
-                </svg>
-              </div>
-              <div>
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                  <h3 class="text-white font-bold" style="font-size:1.1rem;">Lyria Music Maker</h3>
-                  <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(196,123,235,.1);color:#c47beb;border:1px solid rgba(196,123,235,.28);">AI MUSIC</span>
-                </div>
-                <p class="text-xs" style="color:#6e8aaa;">Google Lyria RealTime · Streaming AI Music</p>
-              </div>
-            </div>
-            <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
-              Generate music in real-time using <strong style="color:#6e8aaa;">Google Lyria RealTime</strong> —
-              stream AI-composed audio directly in your browser. Control <strong style="color:#6e8aaa;">BPM, mood, brightness and density</strong>,
-              pick instruments, and export any session as a <strong style="color:#6e8aaa;">WAV file</strong> to drop straight into your edit.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="skill-tag">Real-time Stream</span>
-              <span class="skill-tag">Instrument Select</span>
-              <span class="skill-tag">BPM Control</span>
-              <span class="skill-tag">WAV Export</span>
-              <span class="skill-tag">Voice Prompt</span>
-            </div>
-          </div>
-          <!-- Right: CTA -->
-          <div class="flex flex-col gap-3 justify-center md:min-w-[200px]">
-            <a href="music-maker/index.html"
-              class="px-6 py-3 rounded-xl font-semibold text-sm"
-              style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(196,123,235,.14),rgba(255,45,120,.1));border:1px solid rgba(196,123,235,.35);color:#c47beb;transition:opacity .2s;"
-              onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-              Open Music Maker →
-            </a>
-            <p class="text-xs text-center" style="color:#4e6280;">Requires Gemini API key · Browser only</p>
-          </div>
+      <!-- SRT Maker -->
+      <a href="/srt-maker/" class="card-bg card-glow rounded-2xl p-5 flex items-center gap-4" style="border-color:#1a2d47; text-decoration:none;">
+        <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(56,217,217,.12),rgba(91,141,238,.1));border:1px solid rgba(56,217,217,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38d9d9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
         </div>
-      </div>
-
-
-      <!-- Consistency Keeper — spans full width -->
-      <div class="card-bg card-glow rounded-2xl overflow-hidden md:col-span-2" style="border-color:#1a2d47;">
-        <!-- Top accent bar -->
-        <div style="height:3px;background:linear-gradient(90deg,#e8a020,#ff6b35);"></div>
-        <div class="p-7 flex flex-col md:flex-row gap-8">
-          <!-- Left: header + description -->
-          <div class="flex flex-col gap-5 flex-1">
-            <div class="flex items-start gap-4">
-              <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(232,160,32,.12),rgba(255,107,53,.1));border:1px solid rgba(232,160,32,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8a020" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                  <polyline points="10 17 15 12 10 7"/>
-                  <line x1="15" y1="12" x2="3" y2="12"/>
-                </svg>
-              </div>
-              <div>
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                  <h3 class="text-white font-bold" style="font-size:1.1rem;">Consistency Keeper</h3>
-                  <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(232,160,32,.1);color:#e8a020;border:1px solid rgba(232,160,32,.28);">CLAUDE AI</span>
-                </div>
-                <p class="text-xs" style="color:#6e8aaa;">Anthropic Claude · Multi-Shot Consistency</p>
-              </div>
-            </div>
-            <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
-              Generate <strong style="color:#6e8aaa;">consistent video prompts</strong> across multiple shots using
-              <strong style="color:#6e8aaa;">Anthropic Claude</strong>. Lock anchor subjects, styles, and environments
-              so every shot in your sequence stays visually coherent — built for
-              <strong style="color:#6e8aaa;">Kling 3.0, Runway Gen-4, Veo 3, and Midjourney V7</strong>.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="skill-tag">Anchor Lock</span>
-              <span class="skill-tag">Multi-Shot</span>
-              <span class="skill-tag">4 Platforms</span>
-              <span class="skill-tag">Prompt Variations</span>
-              <span class="skill-tag">Anthropic API</span>
-            </div>
-          </div>
-          <!-- Right: CTA -->
-          <div class="flex flex-col gap-3 justify-center md:min-w-[200px]">
-            <a href="consistency-keeper.html"
-              class="px-6 py-3 rounded-xl font-semibold text-sm"
-              style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(232,160,32,.14),rgba(255,107,53,.1));border:1px solid rgba(232,160,32,.35);color:#e8a020;transition:opacity .2s;"
-              onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-              Open Consistency Keeper →
-            </a>
-            <p class="text-xs text-center" style="color:#4e6280;">Requires Anthropic API key · Browser only</p>
-          </div>
+        <div>
+          <div class="font-semibold text-white text-sm mb-1">SRT Maker</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Offline Whisper-powered subtitle generator for Windows &amp; Mac. Drop file, get .srt.</p>
         </div>
-      </div>
+      </a>
 
-      <!-- CineScan — spans full width -->
-      <div class="card-bg card-glow rounded-2xl overflow-hidden md:col-span-2" style="border-color:#1a2d47;">
-        <!-- Top accent bar -->
-        <div style="height:3px;background:linear-gradient(90deg,#00d4ff,#0088cc);"></div>
-        <div class="p-7 flex flex-col md:flex-row gap-8">
-          <!-- Left: header + description -->
-          <div class="flex flex-col gap-5 flex-1">
-            <div class="flex items-start gap-4">
-              <div style="width:48px;height:48px;background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(0,136,204,.1));border:1px solid rgba(0,212,255,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/>
-                  <path d="M3 9h18M9 21V9"/>
-                </svg>
-              </div>
-              <div>
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                  <h3 class="text-white font-bold" style="font-size:1.1rem;">CineScan</h3>
-                  <span style="font-size:10px;font-weight:600;letter-spacing:.09em;padding:2px 8px;border-radius:20px;background:rgba(0,212,255,.1);color:#00d4ff;border:1px solid rgba(0,212,255,.28);">BETA</span>
-                </div>
-                <p class="text-xs" style="color:#6e8aaa;">Reverse Prompt Engine · Cinematographic Analysis</p>
-              </div>
-            </div>
-            <p class="text-sm leading-relaxed" style="color:#4e6280; line-height:1.8;">
-              Upload any <strong style="color:#6e8aaa;">film still</strong> and get back a full cinematographic breakdown —
-              lens, lighting, color grade, shot type, and mood —
-              formatted as a <strong style="color:#6e8aaa;">ready-to-use AI video prompt</strong>.
-              Powered by <strong style="color:#6e8aaa;">Anthropic Claude</strong>, outputs for
-              <strong style="color:#6e8aaa;">Kling 3.0, Runway Gen-4, Veo 3, and Midjourney V7</strong>.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="skill-tag">Frame Upload</span>
-              <span class="skill-tag">Lens Analysis</span>
-              <span class="skill-tag">Color Grade</span>
-              <span class="skill-tag">4 Platforms</span>
-              <span class="skill-tag">Anthropic API</span>
-            </div>
-          </div>
-          <!-- Right: CTA -->
-          <div class="flex flex-col gap-3 justify-center md:min-w-[200px]">
-            <a href="cinescan.html"
-              class="px-6 py-3 rounded-xl font-semibold text-sm"
-              style="text-align:center;display:block;letter-spacing:.02em;background:linear-gradient(135deg,rgba(0,212,255,.14),rgba(0,136,204,.1));border:1px solid rgba(0,212,255,.35);color:#00d4ff;transition:opacity .2s;"
-              onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-              Open CineScan →
-            </a>
-            <p class="text-xs text-center" style="color:#4e6280;">Requires Anthropic API key · Browser only</p>
-          </div>
+      <!-- Lyria Music Maker -->
+      <a href="/music-maker/" class="card-bg card-glow rounded-2xl p-5 flex items-center gap-4" style="border-color:#1a2d47; text-decoration:none;">
+        <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(196,123,235,.12),rgba(255,45,120,.1));border:1px solid rgba(196,123,235,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c47beb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
         </div>
-      </div>
+        <div>
+          <div class="font-semibold text-white text-sm mb-1">Lyria Music Maker</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Real-time AI music via Google Lyria. Stream, control BPM &amp; mood, export WAV.</p>
+        </div>
+      </a>
+
+      <!-- CineRoute -->
+      <a href="/cineroute.html" class="card-bg card-glow rounded-2xl p-5 flex items-center gap-4" style="border-color:#1a2d47; text-decoration:none;">
+        <div style="width:42px;height:42px;background:linear-gradient(135deg,rgba(255,115,56,.12),rgba(255,45,120,.1));border:1px solid rgba(255,115,56,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff7338" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 16v-3a4 4 0 0 1 4-4h4"/><polyline points="14 6 18 6 18 10"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-white text-sm mb-1">CineRoute</div>
+          <p class="text-xs leading-relaxed" style="color:#4e6280;">Dial in your shot across 5 dimensions — get ranked AI platform recommendations with reasoning.</p>
+        </div>
+      </a>
+
 
     </div>
   </div>
